@@ -37,7 +37,7 @@ Os protótipos das telas que compõem o fluxo principal do sistema foram elabora
 4. [Cadastro de Estabelecimento](./public/cadastro-estabelecimento.png)
 5. [Avaliação de Local](./public/avaliacao.png)
 
-> **Nota:** As imagens dos protótipos estão armazenadas na pasta `./public` deste repositório para referência visual do fluxo e interface.
+> **Obs.:** As imagens dos protótipos estão armazenadas na pasta `./public` deste repositório para referência visual do fluxo e interface.
 
 
 
