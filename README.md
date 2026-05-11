@@ -29,8 +29,10 @@ Neste trabalho não serão considerados:
 
 ## 4. Protótipo
 
-Protótipo da página inicial do AbleGo:
-<img width="2222" height="1888" alt="HomeScreen" src="https://github.com/user-attachments/assets/ddff8c4f-8003-46da-8746-800ccca5d3bd" />
+<ol>
+    <a href="./public/home-screen.jpeg"> 1. Tela Inicial </a>
+    <img width="2222" height="1888" alt="HomeScreen" src="https://github.com/user-attachments/assets/ddff8c4f-8003-46da-8746-800ccca5d3bd" />
+</ol>
 
 
 ## 5. Referências
