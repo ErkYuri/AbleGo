@@ -16,8 +16,8 @@ Este projeto terá as seguintes funcionalidades:
 - **Autenticação e Gestão de Perfis:** Cadastro e login de usuários na plataforma.
 - **Diretório de Locais:** Cadastro colaborativo de novos estabelecimentos comerciais, culturais e públicos.
 - **Sistema de Avaliação Inclusiva:** Funcionalidade onde os usuários pontuam a presença ou ausência de recursos de acessibilidade específicos (ex: rampas de acesso, banheiros adaptados, cardápios em Braille, piso podotátil, intérprete de Libras, etc.).
-- **Interface de Selos Semânticos:** Exibição clara e de alto contraste da acessibilidade dos locais por meio de pílulas visuais (indicadores verdes e vermelhos) para facilitar a carga cognitiva e a leitura rápida.
-- **Motor de Busca Estratégico:** Barra de pesquisa e filtros avançados que permitem encontrar estabelecimentos cruzando categorias (ex: restaurantes, museus) com recursos de acessibilidade desejados.
+- **Interface de Selos Semânticos:** Exibição da acessibilidade dos locais por meio de etiquetas visuais (indicadores verdes e vermelhos) para facilitar a identificação e leitura rápida.
+- **Motor de Busca Estratégico:** Barra de pesquisa e filtros que permitem encontrar estabelecimentos cruzando categorias (ex: restaurantes, museus) com recursos de acessibilidade desejados.
 
 ## 3. Restrições
 
