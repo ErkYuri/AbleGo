@@ -29,10 +29,17 @@ Neste trabalho não serão considerados:
 
 ## 4. Protótipo
 
-<ol>
-    <a href="./public/home-screen.jpeg"> 1. Tela Inicial </a>
-    <img width="2222" height="1888" alt="HomeScreen" src="https://github.com/user-attachments/assets/ddff8c4f-8003-46da-8746-800ccca5d3bd" />
-</ol>
+Os protótipos das telas que compõem o fluxo principal do sistema foram elaborados e podem ser acessados nos links abaixo:
+
+1. [Tela Inicial](./public/home-screen.jpeg)
+2. [Cadastro de Usuário](./public/cadastro-usuario.png)
+3. [Login](./public/login.png)
+4. [Cadastro de Estabelecimento](./public/cadastro-estabelecimento.png)
+5. [Avaliação de Local](./public/avaliacao.png)
+
+> **Nota:** As imagens dos protótipos estão armazenadas na pasta `./public` deste repositório para referência visual do fluxo e interface.
+
+
 
 
 ## 5. Referências
