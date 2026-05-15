@@ -1,51 +1,53 @@
+import './CardLocal.css';
+
 function CardLocal({ nome, categoria, nota, imagem, tagVerde, iconeVerde, tagVermelha, extras, onAbrirModal }) {
   return (
-    <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 w-full max-w-sm overflow-hidden border border-slate-100 flex flex-col">
+    <div className="card-container">
       
       {/* 1. Bloco da Foto */}
-      <div className="relative h-48 w-full shrink-0">
+      <div className="card-image-wrapper">
         <img 
           src={imagem} 
           alt={`Foto de ${nome}`} 
-          className="w-full h-full object-cover"
+          className="card-img"
         />
-        <span className="absolute bottom-3 left-3 bg-slate-900 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+        <span className="card-category">
           {categoria}
         </span>
-        <div className="absolute top-3 right-3 bg-white text-slate-800 text-xs font-bold px-2 py-1 rounded-lg shadow-sm flex items-center gap-1">
-          <span className="text-yellow-500">⭐</span> {nota}
+        <div className="card-rating">
+          <span className="rating-star">⭐</span> {nota}
         </div>
       </div>
       
       {/* 2. Bloco dos Textos */}
-      <div className="p-5 flex flex-col grow">
-        <h3 className="text-xl font-bold text-slate-800">{nome}</h3>
+      <div className="card-content">
+        <h3 className="card-title">{nome}</h3>
         
-        <p className="mt-4 mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+        <p className="checklist-label">
           Checklist de Acessibilidade
         </p>
 
-        <div className="flex flex-col gap-2">
+        <div className="badges-container">
           
           {/* Selo Verde */}
-          <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 px-3 py-2 rounded-lg text-sm font-semibold">
+          <div className="badge-green">
             <span>{iconeVerde}</span> {tagVerde}
           </div>
 
           {/* Selo Vermelho */}
           {tagVermelha && (
-            <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm font-semibold">
+            <div className="badge-red">
               <span>❌</span> {tagVermelha}
             </div>
           )}
 
           {/* Botão de Extras */}
           {extras && (
-            <div className="flex justify-end mt-1">
-
+            <div className="extras-container">
               <button 
                 onClick={onAbrirModal}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm px-4 py-1.5 rounded-lg border border-slate-200 transition-colors active:scale-95 shadow-sm">
+                className="btn-extras"
+              >
                 +{extras}
               </button>
             </div>
@@ -54,7 +56,7 @@ function CardLocal({ nome, categoria, nota, imagem, tagVerde, iconeVerde, tagVer
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default CardLocal
+export default CardLocal;

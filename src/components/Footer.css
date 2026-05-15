@@ -1,0 +1,116 @@
+/* Container Principal do Footer */
+.footer-container {
+  background-color: #0f172a; /* bg-slate-900 */
+  color: #cbd5e1; /* text-slate-300 */
+  padding-top: 3rem; /* py-12 */
+  padding-bottom: 3rem;
+  margin-top: 4rem; /* mt-16 */
+  border-top: 4px solid #f97316; /* border-t-4 border-orange-500 */
+}
+
+/* Grid das Colunas */
+.footer-grid {
+  max-width: 56rem; /* max-w-4xl */
+  margin: 0 auto;
+  padding: 0 1rem; /* px-4 */
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem; /* gap-8 */
+}
+
+/* Coluna Individual */
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* gap-3 para links, a brand-col sobrescreve com gap-4 */
+}
+
+.brand-col {
+  gap: 1rem; /* gap-4 */
+}
+
+/* Estilos da Marca */
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-text {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: bold;
+  color: white;
+  letter-spacing: 0.025em; /* tracking-wide */
+}
+
+.brand-highlight {
+  color: #f97316; /* text-orange-500 */
+}
+
+.brand-description {
+  font-size: 0.875rem; /* text-sm */
+  color: #94a3b8; /* text-slate-400 */
+  line-height: 1.625; /* leading-relaxed */
+  margin: 0;
+}
+
+/* Títulos das Colunas de Links */
+.footer-col-title {
+  color: white;
+  font-weight: bold;
+  margin-bottom: 0.5rem; /* mb-2 */
+  margin-top: 0;
+}
+
+/* Links */
+.footer-link {
+  font-size: 0.875rem; /* text-sm */
+  color: #cbd5e1;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #f97316; /* hover:text-orange-500 */
+}
+
+/* Parte Inferior (Direitos Autorais) */
+.footer-bottom {
+  max-width: 56rem; /* max-w-4xl */
+  margin: 3rem auto 0; /* mt-12 */
+  padding: 1.5rem 1rem 0; /* pt-6 px-4 */
+  border-top: 1px solid #1e293b; /* border-slate-800 */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem; /* gap-4 */
+}
+
+.copyright-text, .footer-slogan {
+  font-size: 0.75rem; /* text-xs */
+  color: #64748b; /* text-slate-500 */
+  margin: 0;
+}
+
+.footer-slogan {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Responsividade */
+@media (min-width: 768px) {
+  .footer-grid {
+    padding: 0 2.5rem; /* md:px-10 */
+    grid-template-columns: repeat(3, 1fr); /* md:grid-cols-3 */
+  }
+
+  .footer-bottom {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+    flex-direction: row; /* md:flex-row */
+    justify-content: space-between;
+    text-align: left; /* md:text-left */
+  }
+}
