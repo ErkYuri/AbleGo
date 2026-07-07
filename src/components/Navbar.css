@@ -19,7 +19,13 @@
 .navbar-logo-area {
   display: flex;
   align-items: center;
+}
+
+.navbar-logo-link {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
+  text-decoration: none; /* Remove o sublinhado do link na logo */
 }
 
 .navbar-logo-img {
@@ -38,27 +44,32 @@
 .navbar-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1.25rem; /* Espaçamento confortável entre os itens */
 }
 
-/* Botão de Ajuda */
-.btn-help {
-  font-size: 0.875rem;
+/* Links de Navegação Padrão (Cadastrar e Ajuda) */
+.nav-link {
+  font-size: 0.9rem;
   font-weight: 500;
-  color: white;
+  color: #e2e8f0; /* Branco levemente acinzentado para suavidade */
+  text-decoration: none;
   background: transparent;
   border: none;
   cursor: pointer;
   transition: color 0.3s ease;
+  padding: 0;
+  display: flex;
+  align-items: center;
 }
 
-.btn-help:hover {
-  color: #ea580c; /* text-orange-600 */
+/* Efeito laranja ao passar o mouse */
+.nav-link:hover {
+  color: #f47b20; 
 }
 
-/* Botão de Login */
+/* Botão de Login (Destaque Principal) */
 .btn-login {
-  background-color: #f97316; /* bg-orange-500 */
+  background-color: #f47b20; /* Laranja Suave */
   color: white;
   padding: 0.5rem 1.25rem;
   font-size: 0.875rem;
@@ -68,16 +79,16 @@
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   cursor: pointer;
   transition: all 0.3s ease;
+  margin-left: 0.5rem; /* Afasta um pouco dos links de texto */
 }
 
 .btn-login:hover {
-  background-color: #ea580c; /* bg-orange-600 */
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  background-color: #e06915; 
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .btn-login:active {
   transform: scale(0.95);
-  background-color: #c2410c; /* bg-orange-700 */
 }
 
 /* Responsividade (Telas Maiores) */

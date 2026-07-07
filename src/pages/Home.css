@@ -207,3 +207,23 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+/* Mensagens de Status (Carregando, Erro ou Vazio) */
+.status-msg {
+  text-align: center;
+  font-size: 1.125rem;
+  color: #64748b;
+  margin-top: 2rem;
+  font-weight: 500;
+  width: 100%;
+}
+
+.status-msg.erro {
+  color: #b91c1c; 
+  background-color: #fef2f2; 
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+  margin: 2rem auto;
+  max-width: 400px;
+}

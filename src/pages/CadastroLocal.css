@@ -1,0 +1,148 @@
+/* Container principal da página */
+.cadastro-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh; 
+  background-color: #f8f9fa; 
+  padding: 2rem;
+}
+
+/* O cartão branco onde o formulário fica dentro */
+.cadastro-card {
+  background-color: #ffffff;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(26, 43, 76, 0.08); 
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Textos e Títulos */
+.cadastro-title {
+  color: #1a2b4c; 
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.cadastro-subtitle {
+  color: #64748b;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+/* Estrutura do Formulário */
+.cadastro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; 
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: #1a2b4c;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Estilo das caixas de texto e seleção */
+.form-group input,
+.form-group select {
+  padding: 0.8rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #334155;
+  outline: none;
+  transition: border-color 0.3s ease;
+  background-color: #f8f9fa;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #f47b20; 
+  background-color: #ffffff;
+}
+
+/* Agrupamento dos botões no final do formulário */
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* Botão de Envio (Destaque Laranja) */
+.btn-cadastro-submit {
+  background-color: #f47b20; 
+  color: #ffffff;
+  border: none;
+  padding: 1rem;
+  border-radius: 25px; 
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.btn-cadastro-submit:hover:not(:disabled) {
+  background-color: #e06915;
+}
+
+.btn-cadastro-submit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-cadastro-submit:disabled {
+  background-color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+/* Botão Secundário (Cancelar) */
+.btn-cadastro-cancelar {
+  background-color: transparent;
+  color: #64748b; /* Cinza médio discreto */
+  text-decoration: none;
+  text-align: center;
+  padding: 0.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cadastro-cancelar:hover {
+  background-color: #f1f5f9; /* Fundo cinza bem clarinho ao passar o mouse */
+  color: #1a2b4c; /* Texto escurece para azul-marinho */
+}
+
+/* Estilos dos alertas (Sucesso / Erro) */
+.cadastro-alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.cadastro-alert.sucesso {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.cadastro-alert.erro {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}

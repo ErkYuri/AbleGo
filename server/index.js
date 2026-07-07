@@ -1,12 +1,15 @@
 const express = require('express');
+const cors = require('cors'); // 1. Trazendo o segurança VIP
 const app = express();
 const pool = require('./database');
-const rotasLocais = require('./routes/locais'); // O "require" deve vir primeiro
+const rotasLocais = require('./routes/locais'); 
 
 const PORT = 3000;
 
+// 2. Avisando o servidor para liberar a entrada (o CORS tem que vir ANTES das rotas!)
+app.use(cors()); 
 app.use(express.json());
-app.use('/api/locais', rotasLocais); // O "use" vem depois que a rota já foi definida
+app.use('/api/locais', rotasLocais); 
 
 // criando rota teste
 app.get('/teste-banco', async (req, res) => {
