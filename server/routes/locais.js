@@ -9,7 +9,7 @@ router.post('/cadastrar', async (req, res) => {
 
     try {
         const novoLocal = await pool.query(
-            'INSERT INTO locais (nome, cep, logradouro, numero, bairro, cidade, estado, categoria, descricao) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+            'INSERT INTO estabelecimentos (nome, cep, logradouro, numero, bairro, cidade, estado, categoria, descricao) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
             [nome, cep, logradouro, numero, bairro, cidade, estado, categoria, descricao]
         );
         res.status(201).json(novoLocal.rows[0]);
