@@ -134,3 +134,126 @@
   text-align: center;
   padding: 1rem;
 }
+
+/* --- Estilos da Nova Seção de Reviews --- */
+.modal-checklist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+}
+
+.reviews-section {
+  margin-top: 2rem;
+}
+
+.review-form {
+  background-color: #f8f9fa;
+  padding: 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.stars-selector {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #cbd5e1; /* Estrela cinza (apagada) */
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0;
+}
+
+.star-btn.active {
+  color: #fbbf24; /* Estrela amarela (acesa) */
+}
+
+.review-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  resize: vertical;
+  font-family: inherit;
+  margin-bottom: 0.75rem;
+  box-sizing: border-box;
+}
+
+.review-textarea:focus {
+  outline: none;
+  border-color: #f47b20;
+}
+
+.btn-enviar-review {
+  background-color: #1a2b4c;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-enviar-review:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.login-prompt {
+  background-color: #f0fdf4;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.login-prompt a {
+  color: #f47b20;
+  font-weight: bold;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.review-card {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 1rem;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.review-author {
+  font-weight: bold;
+  color: #1e293b;
+}
+
+.review-stars {
+  color: #fbbf24;
+  letter-spacing: 0.1em;
+}
+
+.review-text {
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin: 0;
+}

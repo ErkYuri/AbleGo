@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import CardLocal from '../components/CardLocal';
 import ModalDetalhes from '../components/ModalDetalhes';
-import ModalEditar from '../components/ModalEditar'; // 1. IMPORTA O NOVO MODAL
+import ModalEditar from '../components/ModalEditar';
 import Footer from '../components/Footer';
 import './Home.css'; 
 
@@ -9,16 +9,20 @@ function Home() {
   const [locais, setLocais] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+  
   const [localSelecionado, setLocalSelecionado] = useState(null);
-  
-  // 2. NOVO ESTADO: Para saber qual local está sendo editado no momento
   const [localEmEdicao, setLocalEmEdicao] = useState(null);
+  const [usuarioLogado, setUsuarioLogado] = useState(null);
   
+  // Estados dos Filtros
   const [busca, setBusca] = useState('');
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Todos');
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
+  
+  // NOVOS ESTADOS: Filtros Avançados
+  const [itensAcessibilidade, setItensAcessibilidade] = useState([]);
+  const [filtrosAcessibilidade, setFiltrosAcessibilidade] = useState([]);
+  const [mostrarFiltrosAvancados, setMostrarFiltrosAvancados] = useState(false);
 
-  // Isolamos a função de busca de locais para podermos chamá-la de novo após uma edição com sucesso
   const carregarDadosDoServidor = async () => {
     try {
       const resposta = await fetch('http://localhost:3000/api/locais');
@@ -36,23 +40,32 @@ function Home() {
     }
   };
 
+  const carregarItensAcessibilidade = async () => {
+    try {
+      const resposta = await fetch('http://localhost:3000/api/locais/itens');
+      if (resposta.ok) {
+        const dados = await resposta.json();
+        setItensAcessibilidade(dados);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar itens de acessibilidade:', error);
+    }
+  };
+
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem('usuario');
     if (usuarioSalvo) {
       setUsuarioLogado(JSON.parse(usuarioSalvo));
     }
     carregarDadosDoServidor();
+    carregarItensAcessibilidade();
   }, []);
 
   const handleExcluir = async (id, nome) => {
     const confirmacao = window.confirm(`Tem certeza que deseja excluir permanentemente o local "${nome}"?`);
-    
     if (confirmacao) {
       try {
-        const resposta = await fetch(`http://localhost:3000/api/locais/${id}`, {
-          method: 'DELETE'
-        });
-
+        const resposta = await fetch(`http://localhost:3000/api/locais/${id}`, { method: 'DELETE' });
         if (resposta.ok) {
           setLocais((locaisAnteriores) => locaisAnteriores.filter(local => local.id !== id));
         } else {
@@ -65,17 +78,33 @@ function Home() {
     }
   };
 
-  // 3. ATUALIZADO: Salva o local inteiro no estado para abrir o modal de edição
   const handleAbrirEdicao = (local) => {
     setLocalEmEdicao(local);
   };
 
-  const locaisFiltrados = locales => locais.filter((local) => {
+  // Função para marcar/desmarcar um item no filtro avançado
+  const toggleFiltroAcessibilidade = (id) => {
+    setFiltrosAcessibilidade((prev) => 
+      prev.includes(id) ? prev.filter(filtroId => filtroId !== id) : [...prev, id]
+    );
+  };
+
+  // Lógica Mestra de Filtragem
+  const locaisFiltrados = locais.filter((local) => {
+    // 1. Filtro de Categoria
     const combinaCategoria = categoriaSelecionada === 'Todos' || local.categoria === categoriaSelecionada;
+    
+    // 2. Filtro de Busca por Texto
     const combinaBusca = 
       local.nome.toLowerCase().includes(busca.toLowerCase()) || 
       local.endereco.toLowerCase().includes(busca.toLowerCase());
-    return combinaCategoria && combinaBusca;
+      
+    // 3. Filtro Avançado (O local DEVE ter TODOS os itens selecionados no filtro)
+    const combinaAcessibilidade = filtrosAcessibilidade.length === 0 || filtrosAcessibilidade.every(filtroId => 
+      local.acessibilidade.some(itemLocal => itemLocal.id === filtroId)
+    );
+
+    return combinaCategoria && combinaBusca && combinaAcessibilidade;
   });
 
   return (
@@ -86,7 +115,7 @@ function Home() {
           Sua cidade <span className="text-highlight">sem barreiras.</span>
         </h1>
         <p className="home-subtitle">
-          Encontre e avalie a acessibilidade de restaurantes, parks e pontos culturais perto de você.
+          Encontre e avalie a acessibilidade de restaurantes, parques e pontos culturais perto de você.
         </p>
 
         <div className="search-container" role="search">
@@ -105,9 +134,6 @@ function Home() {
           />
           <button className="search-button" aria-label="Pesquisar">
             <span className="search-text">Buscar</span>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="search-btn-icon" aria-hidden="true">
-              <path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clipRule="evenodd" />
-            </svg>
           </button>
         </div>
 
@@ -119,31 +145,61 @@ function Home() {
           <button className={`filter-btn ${categoriaSelecionada === 'Parques' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Parques')}>🌳 Parques</button>
         </div>
 
+        {/* NOVA ÁREA: Filtros Avançados */}
+        <div className="advanced-filters-wrapper">
+          <button 
+            className={`btn-toggle-advanced ${mostrarFiltrosAvancados ? 'active' : ''}`}
+            onClick={() => setMostrarFiltrosAvancados(!mostrarFiltrosAvancados)}
+          >
+            ⚙️ Filtros Avançados {filtrosAcessibilidade.length > 0 && `(${filtrosAcessibilidade.length})`}
+          </button>
+
+          {mostrarFiltrosAvancados && (
+            <div className="advanced-filters-panel">
+              <p className="advanced-filters-title">Mostrar apenas locais que possuam:</p>
+              <div className="advanced-filters-grid">
+                {itensAcessibilidade.map(item => (
+                  <button 
+                    key={item.id}
+                    className={`adv-filter-item ${filtrosAcessibilidade.includes(item.id) ? 'selected' : ''}`}
+                    onClick={() => toggleFiltroAcessibilidade(item.id)}
+                  >
+                    <span aria-hidden="true">{item.icone}</span> {item.nome}
+                  </button>
+                ))}
+              </div>
+              {filtrosAcessibilidade.length > 0 && (
+                <button className="btn-clear-filters" onClick={() => setFiltrosAcessibilidade([])}>
+                  Limpar Filtros Específicos
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
         <div className="cards-section" aria-label="Lista de estabelecimentos">
           <h2 className="cards-title">Locais em Destaque</h2>
 
           {carregando && <p className="status-msg" aria-live="polite">Buscando locais...</p>}
           {erro && <p className="status-msg erro" role="alert">{erro}</p>}
-          {!carregando && !erro && locaisFiltrados(locais).length === 0 && (
-            <p className="status-msg">Nenhum estabelecimento encontrado com esses termos. 🔍</p>
+          {!carregando && !erro && locaisFiltrados.length === 0 && (
+            <p className="status-msg">Nenhum estabelecimento encontrado com esses filtros. 🔍</p>
           )}
 
           <div className="cards-grid">
-            {locaisFiltrados(locais).map((local) => (
+            {locaisFiltrados.map((local) => (
               <CardLocal 
                 key={local.id}
                 id={local.id}
                 nome={local.nome}
                 categoria={local.categoria}
-                nota="Novo"
+                nota={local.total_avaliacoes > 0 ? local.nota_media : "Novo"}
                 imagem={local.imagem_url || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80"}
                 acessibilidade={local.acessibilidade} 
                 donoId={local.usuario_id}
                 usuarioLogadoId={usuarioLogado ? usuarioLogado.id : null}
                 onAbrirModal={() => setLocalSelecionado(local)}
                 onExcluir={handleExcluir}
-                
-                // Passa o objeto 'local' inteiro para sabermos qual linha editar
                 onEditar={() => handleAbrirEdicao(local)} 
               />
             ))}
@@ -152,18 +208,14 @@ function Home() {
       </main>
 
       {localSelecionado && (
-        <ModalDetalhes 
-          local={localSelecionado} 
-          fecharModal={() => setLocalSelecionado(null)} 
-        />
+        <ModalDetalhes local={localSelecionado} fecharModal={() => setLocalSelecionado(null)} />
       )}
 
-      {/* 4. SE O ESTADO CONTER UM LOCAL, ABRE O MODAL DE EDIÇÃO */}
       {localEmEdicao && (
         <ModalEditar 
           local={localEmEdicao} 
           fecharModal={() => setLocalEmEdicao(null)} 
-          onSalvarSucesso={carregarDadosDoServidor} // Puxa a lista nova na tela na hora
+          onSalvarSucesso={carregarDadosDoServidor} 
         />
       )}
 
