@@ -116,21 +116,8 @@
   display: none;
 }
 
-/* Filtros em Pílulas */
-.filters-container {
-  width: 100%;
-  margin-top: 2rem;
-  display: flex;
-  gap: 0.75rem;
-  overflow-x: auto;
-  padding-bottom: 1rem;
-  justify-content: flex-start;
-  scrollbar-width: none; /* Esconde scrollbar no Firefox */
-}
 
-.filters-container::-webkit-scrollbar {
-  display: none; /* Esconde scrollbar no Chrome/Safari */
-}
+
 
 .filter-btn {
   white-space: nowrap;
@@ -322,3 +309,100 @@
   text-decoration: underline;
   padding: 0;
 }
+
+/* --- CARROSSEL DE CATEGORIAS --- */
+.categories-carousel-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 800px;
+}
+
+.carousel-arrow {
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #1a2b4c;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.carousel-arrow:hover {
+  background-color: #e2e8f0;
+  color: #f47b20;
+  border-color: #94a3b8;
+}
+
+.filters-container {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  flex: 1;
+  padding: 0.5rem 1rem; /* Dá espaço para os botões respirarem nas bordas */
+  justify-content: flex-start; /* OBRIGA o primeiro item a ficar na esquerda */
+  align-items: center;
+  -ms-overflow-style: none; 
+  scrollbar-width: none;    
+}
+
+.filters-container::-webkit-scrollbar {
+  display: none; 
+}
+
+/* O SEGREDO PARA OS BOTÕES NÃO AMAÇAREM E SUMIREM: */
+.filter-btn {
+  flex-shrink: 0; /* Impede o botão de ser espremido e cortado */
+  white-space: nowrap; /* Impede que o texto do botão quebre em duas linhas */
+}
+
+/* --- ORDENAÇÃO DE LOCAIS --- */
+.cards-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ordenacao-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ordenacao-label {
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.select-ordenacao {
+  padding: 0.5rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #1a2b4c;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.select-ordenacao:focus {
+  border-color: #f47b20;
+  box-shadow: 0 0 0 2px rgba(244, 123, 32, 0.1);
+}
+

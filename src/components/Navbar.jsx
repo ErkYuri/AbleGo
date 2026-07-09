@@ -44,8 +44,8 @@ function Navbar() {
           </span>
         )}
 
-        {/* MUDANÇA AQUI: Botão de Cadastrar Local movido para cá, com a classe btn-login */}
-        <a href="/cadastro" className="btn-login" aria-label="Acessar formulário para cadastrar um novo local">
+        {/* MUDANÇA AQUI: Redireciona dinamicamente dependendo do login */}
+        <a href={usuarioLogado ? "/cadastro" : "/login"} className="btn-login" aria-label="Acessar formulário para cadastrar um novo local">
           + Cadastrar Local
         </a>
       </div>
@@ -61,9 +61,7 @@ function Navbar() {
           {altoContraste ? '☀️ Modo Normal' : '🌓 Alto Contraste'}
         </button>
         
-        <button className="nav-link" aria-label="Abrir central de ajuda">
-          Ajuda
-        </button>
+        {/* O BOTÃO DE AJUDA FOI TOTALMENTE REMOVIDO DAQUI */}
 
         {usuarioLogado ? (
           <div className="user-menu">

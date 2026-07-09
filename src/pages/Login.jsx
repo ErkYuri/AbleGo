@@ -182,8 +182,8 @@ function Login() {
           
           /* === FLUXO NORMAL: LOGIN E CADASTRO === */
           <>
-            <h2 className="login-title">{modoLogin ? 'Bem-vindo de volta!' : 'Crie sua conta'}</h2>
-            <p className="login-subtitle">{modoLogin ? 'Faça login para avaliar estabelecimentos.' : 'Junte-se à comunidade AbleGo.'}</p>
+            <h2 className="login-title">{modoLogin ? 'Bem-vindo!' : 'Crie sua conta'}</h2>
+            <p className="login-subtitle">{modoLogin ? 'Entre para avaliar e cadastrar estabelecimentos.' : 'Junte-se à comunidade AbleGo.'}</p>
             
             {mensagem.texto && <div className={`login-alert ${mensagem.tipo}`}>{mensagem.texto}</div>}
 

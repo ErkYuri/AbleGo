@@ -52,7 +52,7 @@ function CardLocal({ id, nome, categoria, nota, imagem, acessibilidade = [], don
           )}
         </div>
         
-        <span className="checklist-title">CHECKLIST DE ACESSIBILIDADE</span>
+        <span className="checklist-title">RECURSOS ENCONTRADOS</span>
         
         <div className="tags-container">
           {itensVisiveis.map((item) => (

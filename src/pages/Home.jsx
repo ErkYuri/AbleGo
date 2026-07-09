@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import CardLocal from '../components/CardLocal';
 import ModalDetalhes from '../components/ModalDetalhes';
 import ModalEditar from '../components/ModalEditar';
@@ -14,14 +14,15 @@ function Home() {
   const [localEmEdicao, setLocalEmEdicao] = useState(null);
   const [usuarioLogado, setUsuarioLogado] = useState(null);
   
-  // Estados dos Filtros
   const [busca, setBusca] = useState('');
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Todos');
+  const [ordenacao, setOrdenacao] = useState('relevantes'); 
   
-  // NOVOS ESTADOS: Filtros Avançados
   const [itensAcessibilidade, setItensAcessibilidade] = useState([]);
   const [filtrosAcessibilidade, setFiltrosAcessibilidade] = useState([]);
   const [mostrarFiltrosAvancados, setMostrarFiltrosAvancados] = useState(false);
+
+  const carrosselRef = useRef(null);
 
   const carregarDadosDoServidor = async () => {
     try {
@@ -82,30 +83,45 @@ function Home() {
     setLocalEmEdicao(local);
   };
 
-  // Função para marcar/desmarcar um item no filtro avançado
   const toggleFiltroAcessibilidade = (id) => {
     setFiltrosAcessibilidade((prev) => 
       prev.includes(id) ? prev.filter(filtroId => filtroId !== id) : [...prev, id]
     );
   };
 
-  // Lógica Mestra de Filtragem
-  const locaisFiltrados = locais.filter((local) => {
-    // 1. Filtro de Categoria
-    const combinaCategoria = categoriaSelecionada === 'Todos' || local.categoria === categoriaSelecionada;
-    
-    // 2. Filtro de Busca por Texto
-    const combinaBusca = 
-      local.nome.toLowerCase().includes(busca.toLowerCase()) || 
-      local.endereco.toLowerCase().includes(busca.toLowerCase());
-      
-    // 3. Filtro Avançado (O local DEVE ter TODOS os itens selecionados no filtro)
-    const combinaAcessibilidade = filtrosAcessibilidade.length === 0 || filtrosAcessibilidade.every(filtroId => 
-      local.acessibilidade.some(itemLocal => itemLocal.id === filtroId)
-    );
+  const rolarCarrossel = (direcao) => {
+    if (carrosselRef.current) {
+      const distancia = 250;
+      if (direcao === 'esq') {
+        carrosselRef.current.scrollBy({ left: -distancia, behavior: 'smooth' });
+      } else {
+        carrosselRef.current.scrollBy({ left: distancia, behavior: 'smooth' });
+      }
+    }
+  };
 
-    return combinaCategoria && combinaBusca && combinaAcessibilidade;
-  });
+  const locaisProcessados = locais
+    .filter((local) => {
+      const combinaCategoria = categoriaSelecionada === 'Todos' || local.categoria === categoriaSelecionada;
+      const combinaBusca = local.nome.toLowerCase().includes(busca.toLowerCase()) || local.endereco.toLowerCase().includes(busca.toLowerCase());
+      const combinaAcessibilidade = filtrosAcessibilidade.length === 0 || filtrosAcessibilidade.every(filtroId => 
+        local.acessibilidade.some(itemLocal => itemLocal.id === filtroId)
+      );
+      return combinaCategoria && combinaBusca && combinaAcessibilidade;
+    })
+    .sort((a, b) => {
+      if (ordenacao === 'alfabetica_asc') {
+        return a.nome.localeCompare(b.nome);
+      } else if (ordenacao === 'alfabetica_desc') {
+        return b.nome.localeCompare(a.nome);
+      } else if (ordenacao === 'relevantes') {
+        const notaA = a.total_avaliacoes > 0 ? parseFloat(a.nota_media) : 0;
+        const notaB = b.total_avaliacoes > 0 ? parseFloat(b.nota_media) : 0;
+        if (notaB !== notaA) return notaB - notaA; 
+        return a.nome.localeCompare(b.nome); 
+      }
+      return 0;
+    });
 
   return (
     <div className="home-container">
@@ -115,7 +131,7 @@ function Home() {
           Sua cidade <span className="text-highlight">sem barreiras.</span>
         </h1>
         <p className="home-subtitle">
-          Encontre e avalie a acessibilidade de restaurantes, parques e pontos culturais perto de você.
+          Encontre e avalie a acessibilidade de restaurantes, pontos comerciais e serviços perto de você.
         </p>
 
         <div className="search-container" role="search">
@@ -132,20 +148,29 @@ function Home() {
             value={busca}
             onChange={(e) => setBusca(e.target.value)} 
           />
-          <button className="search-button" aria-label="Pesquisar">
-            <span className="search-text">Buscar</span>
+        </div>
+
+        {/* CARROSSEL DE CATEGORIAS COM AS NOVAS OPÇÕES */}
+        <div className="categories-carousel-wrapper">
+          <button className="carousel-arrow" onClick={() => rolarCarrossel('esq')} aria-label="Rolar para esquerda">
+            &#10094;
+          </button>
+          
+          <div className="filters-container" ref={carrosselRef} aria-label="Filtros de categoria">
+            <button className={`filter-btn ${categoriaSelecionada === 'Todos' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Todos')}>📍 Todos</button>
+            <button className={`filter-btn ${categoriaSelecionada === 'Restaurantes' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Restaurantes')}>🍽️ Restaurantes</button>
+            
+            <button className={`filter-btn ${categoriaSelecionada === 'Supermercados' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Supermercados')}>🛒 Supermercados</button>
+            <button className={`filter-btn ${categoriaSelecionada === 'Bancos' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Bancos')}>🏦 Bancos</button>
+            <button className={`filter-btn ${categoriaSelecionada === 'Lazer' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Lazer')}>🎭 Lazer</button>
+            <button className={`filter-btn ${categoriaSelecionada === 'Hospital' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Hospital')}>🏥 Hospital</button>
+          </div>
+
+          <button className="carousel-arrow" onClick={() => rolarCarrossel('dir')} aria-label="Rolar para direita">
+            &#10095;
           </button>
         </div>
 
-        <div className="filters-container" aria-label="Filtros de categoria">
-          <button className={`filter-btn ${categoriaSelecionada === 'Todos' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Todos')}>📍 Todos</button>
-          <button className={`filter-btn ${categoriaSelecionada === 'Restaurantes' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Restaurantes')}>🍽️ Restaurantes</button>
-          <button className={`filter-btn ${categoriaSelecionada === 'Cafés' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Cafés')}>☕ Cafés</button>
-          <button className={`filter-btn ${categoriaSelecionada === 'Museus' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Museus')}>🏛️ Museus</button>
-          <button className={`filter-btn ${categoriaSelecionada === 'Parques' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Parques')}>🌳 Parques</button>
-        </div>
-
-        {/* NOVA ÁREA: Filtros Avançados */}
         <div className="advanced-filters-wrapper">
           <button 
             className={`btn-toggle-advanced ${mostrarFiltrosAvancados ? 'active' : ''}`}
@@ -178,16 +203,33 @@ function Home() {
         </div>
 
         <div className="cards-section" aria-label="Lista de estabelecimentos">
-          <h2 className="cards-title">Locais em Destaque</h2>
+          
+          <div className="cards-header">
+            <h2 className="cards-title">Locais em Destaque</h2>
+            
+            <div className="ordenacao-container">
+              <label htmlFor="ordenacao" className="ordenacao-label">Ordenar por:</label>
+              <select 
+                id="ordenacao" 
+                className="select-ordenacao" 
+                value={ordenacao} 
+                onChange={(e) => setOrdenacao(e.target.value)}
+              >
+                <option value="relevantes">⭐ Mais Relevantes</option>
+                <option value="alfabetica_asc">🔤 A - Z</option>
+                <option value="alfabetica_desc">🔤 Z - A</option>
+              </select>
+            </div>
+          </div>
 
           {carregando && <p className="status-msg" aria-live="polite">Buscando locais...</p>}
           {erro && <p className="status-msg erro" role="alert">{erro}</p>}
-          {!carregando && !erro && locaisFiltrados.length === 0 && (
+          {!carregando && !erro && locaisProcessados.length === 0 && (
             <p className="status-msg">Nenhum estabelecimento encontrado com esses filtros. 🔍</p>
           )}
 
           <div className="cards-grid">
-            {locaisFiltrados.map((local) => (
+            {locaisProcessados.map((local) => (
               <CardLocal 
                 key={local.id}
                 id={local.id}

@@ -2,34 +2,28 @@ import { useState, useEffect } from 'react';
 import './CadastroLocal.css';
 
 function CadastroLocal() {
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
-  
   const [formData, setFormData] = useState({
     nome: '',
     endereco: '',
     categoria: '',
     imagem_url: '',
-    itens: []
+    acessibilidade: [] 
   });
-
+  
   const [itensDisponiveis, setItensDisponiveis] = useState([]);
   const [carregando, setCarregando] = useState(false);
   const [mensagem, setMensagem] = useState({ tipo: '', texto: '' });
+  const [usuarioLogado, setUsuarioLogado] = useState(null);
 
-  // Busca os itens E bloqueia a página se não estiver logado
   useEffect(() => {
-    // 1. Checa o usuário
     const usuarioSalvo = localStorage.getItem('usuario');
     if (usuarioSalvo) {
       setUsuarioLogado(JSON.parse(usuarioSalvo));
     } else {
-      // Se não tem usuário, manda para o Login!
       window.location.href = '/login';
-      return; 
     }
 
-    // 2. Busca os itens de acessibilidade
-    const buscarItens = async () => {
+    const carregarItens = async () => {
       try {
         const resposta = await fetch('http://localhost:3000/api/locais/itens');
         if (resposta.ok) {
@@ -37,10 +31,10 @@ function CadastroLocal() {
           setItensDisponiveis(dados);
         }
       } catch (error) {
-        console.error('Erro ao buscar itens:', error);
+        console.error('Erro ao buscar itens de acessibilidade:', error);
       }
     };
-    buscarItens();
+    carregarItens();
   }, []);
 
   const handleChange = (e) => {
@@ -48,14 +42,16 @@ function CadastroLocal() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleCheckboxChange = (id) => {
-    setFormData((prev) => {
-      const jaSelecionado = prev.itens.includes(id);
-      const novosItens = jaSelecionado
-        ? prev.itens.filter((itemId) => itemId !== id)
-        : [...prev.itens, id];
-      
-      return { ...prev, itens: novosItens };
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+    const itemId = parseInt(value, 10);
+    
+    setFormData((estadoAnterior) => {
+      if (checked) {
+        return { ...estadoAnterior, acessibilidade: [...estadoAnterior.acessibilidade, itemId] };
+      } else {
+        return { ...estadoAnterior, acessibilidade: estadoAnterior.acessibilidade.filter(id => id !== itemId) };
+      }
     });
   };
 
@@ -64,107 +60,102 @@ function CadastroLocal() {
     setCarregando(true);
     setMensagem({ tipo: '', texto: '' });
 
-    if (!formData.nome || !formData.endereco || !formData.categoria) {
-      setMensagem({ tipo: 'erro', texto: 'Por favor, preencha os campos obrigatórios.' });
+    if (!usuarioLogado) {
+      setMensagem({ tipo: 'erro', texto: 'Você precisa estar logado para cadastrar.' });
       setCarregando(false);
       return;
     }
 
-    // ATUALIZADO: Prepara o pacote de dados injetando o ID do usuário dono
-    const pacoteDeDados = {
+    const dadosParaEnviar = {
       ...formData,
       usuario_id: usuarioLogado.id 
     };
 
     try {
-      const resposta = await fetch('http://localhost:3000/api/locais/cadastrar', {
+      const resposta = await fetch('http://localhost:3000/api/locais', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(pacoteDeDados)
+        body: JSON.stringify(dadosParaEnviar)
       });
 
       if (resposta.ok) {
         setMensagem({ tipo: 'sucesso', texto: 'Estabelecimento cadastrado com sucesso!' });
-        setFormData({ nome: '', endereco: '', categoria: '', imagem_url: '', itens: [] });
+        setFormData({ nome: '', endereco: '', categoria: '', imagem_url: '', acessibilidade: [] });
       } else {
-        const textoErro = await resposta.text();
-        setMensagem({ tipo: 'erro', texto: textoErro || 'Erro ao cadastrar.' });
+        const erroMsg = await resposta.text();
+        setMensagem({ tipo: 'erro', texto: erroMsg || 'Erro ao cadastrar. Tente novamente.' });
       }
     } catch (error) {
-      console.error('Erro:', error);
-      setMensagem({ tipo: 'erro', texto: 'Não foi possível conectar ao servidor.' });
+      setMensagem({ tipo: 'erro', texto: 'Erro de conexão com o servidor.' });
     } finally {
       setCarregando(false);
     }
   };
 
-  // Se a página estiver checando o login, não mostra nada ainda
-  if (!usuarioLogado) return null; 
+  if (!usuarioLogado) return null;
 
   return (
-    <div className="cadastro-page-container">
+    <div className="cadastro-container">
       <main className="cadastro-card">
-        <h2 className="cadastro-title">Cadastrar Novo Estabelecimento</h2>
-        <p className="cadastro-subtitle">
-          Ajude a comunidade expandindo o mapa.
-        </p>
-
+        <h2 className="cadastro-title">Cadastrar Novo Local</h2>
+        <p className="cadastro-subtitle">Ajude a construir uma cidade mais inclusiva mapeando novos estabelecimentos.</p>
+        
         {mensagem.texto && (
-          <div className={`cadastro-alert ${mensagem.tipo}`} role="alert" aria-live="assertive">
+          <div className={`mensagem-alerta ${mensagem.tipo}`}>
             {mensagem.texto}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="cadastro-form" noValidate>
+        <form className="cadastro-form" onSubmit={handleSubmit}>
+          
           <div className="form-group">
-            <label htmlFor="nome">Nome do Local *</label>
-            <input type="text" id="nome" name="nome" value={formData.nome} onChange={handleChange} required />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="endereco">Endereço Completo *</label>
-            <input type="text" id="endereco" name="endereco" value={formData.endereco} onChange={handleChange} required />
+            <label htmlFor="nome">Nome do Estabelecimento *</label>
+            <input type="text" id="nome" name="nome" value={formData.nome} onChange={handleChange} required placeholder="Ex: Padaria Central" />
           </div>
 
           <div className="form-group">
             <label htmlFor="categoria">Categoria *</label>
             <select id="categoria" name="categoria" value={formData.categoria} onChange={handleChange} required>
               <option value="">Selecione uma categoria...</option>
-              <option value="Restaurantes">Restaurante</option>
-              <option value="Cafés">Café</option>
-              <option value="Museus">Museu</option>
-              <option value="Parques">Parque</option>
-              <option value="Cultura">Cultura / Lazer</option>
+              <option value="Restaurantes">Restaurantes</option>
+              <option value="Supermercados">Supermercados</option>
+              <option value="Bancos">Bancos</option>
+              <option value="Lazer">Lazer</option>
+              <option value="Hospital">Hospital</option>
             </select>
           </div>
 
           <div className="form-group">
-            <label htmlFor="imagem_url">URL da Imagem (Opcional)</label>
-            <input type="url" id="imagem_url" name="imagem_url" value={formData.imagem_url} onChange={handleChange} />
+            <label htmlFor="endereco">Endereço Completo *</label>
+            <input type="text" id="endereco" name="endereco" value={formData.endereco} onChange={handleChange} required placeholder="Rua, Número, Bairro, Cidade" />
           </div>
 
           <div className="form-group">
-            <label>Itens de Acessibilidade Disponíveis</label>
+            <label htmlFor="imagem_url">Link da Imagem (Opcional)</label>
+            <input type="url" id="imagem_url" name="imagem_url" value={formData.imagem_url} onChange={handleChange} placeholder="https://exemplo.com/imagem.jpg" />
+          </div>
+
+          <div className="form-group">
+            <label>O que este local oferece? (Checklist de Acessibilidade)</label>
             <div className="checkbox-grid">
               {itensDisponiveis.map((item) => (
                 <label key={item.id} className="checkbox-item">
-                  <input
-                    type="checkbox"
-                    checked={formData.itens.includes(item.id)}
-                    onChange={() => handleCheckboxChange(item.id)}
+                  <input 
+                    type="checkbox" 
+                    value={item.id}
+                    checked={formData.acessibilidade.includes(item.id)}
+                    onChange={handleCheckboxChange}
                   />
-                  <span>{item.icone} {item.nome}</span>
+                  <span><span aria-hidden="true">{item.icone}</span> {item.nome}</span>
                 </label>
               ))}
             </div>
           </div>
 
-          <div className="form-actions">
-            <button type="submit" className="btn-cadastro-submit" disabled={carregando}>
-              {carregando ? 'Salvando...' : 'Cadastrar Local'}
-            </button>
-            <a href="/" className="btn-cadastro-cancelar">Cancelar</a>
-          </div>
+          <button type="submit" className="btn-submit" disabled={carregando}>
+            {carregando ? 'Salvando...' : 'Finalizar Cadastro'}
+          </button>
+          
         </form>
       </main>
     </div>

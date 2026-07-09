@@ -102,10 +102,10 @@ function ModalEditar({ local, fecharModal, onSalvarSucesso }) {
             <label htmlFor="categoria">Categoria *</label>
             <select id="categoria" name="categoria" value={formData.categoria} onChange={handleChange} required>
               <option value="Restaurantes">Restaurante</option>
-              <option value="Cafés">Café</option>
-              <option value="Museus">Museu</option>
-              <option value="Parques">Parque</option>
-              <option value="Cultura">Cultura / Lazer</option>
+              <option value="Supermercados">Supermercados</option>
+              <option value="Bancos">Bancos</option>
+              <option value="Lazer">Lazer</option>
+              <option value="Hospital">Hospital</option>
             </select>
           </div>
 
