@@ -122,7 +122,7 @@ function ModalDetalhes({ local, fecharModal }) {
                   className="review-textarea"
                   rows="3"
                 ></textarea>
-                <button type="submit" className="btn-enviar-review" disabled={carregando || !comentario.trim()}>
+                <button type="submit" className="btn-enviar-review" disabled={carregando}>
                   {carregando ? 'Enviando...' : 'Publicar Avaliação'}
                 </button>
               </form>

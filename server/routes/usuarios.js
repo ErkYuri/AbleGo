@@ -78,4 +78,37 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// 3. Rota para buscar o histórico completo do usuário (locais e avaliações)
+router.get('/:id/perfil', async (req, res) => {
+    const { id } = req.params;
+    
+    try {
+        // Busca os estabelecimentos que este usuário cadastrou
+        const locais = await pool.query(
+            'SELECT * FROM estabelecimentos WHERE usuario_id = $1 ORDER BY id DESC', 
+            [id]
+        );
+
+        // Busca as avaliações que este usuário fez (trazendo junto o nome do local avaliado)
+        const avaliacoes = await pool.query(
+            `SELECT a.*, e.nome as nome_local 
+             FROM avaliacoes a 
+             JOIN estabelecimentos e ON a.estabelecimento_id = e.id 
+             WHERE a.usuario_id = $1 
+             ORDER BY a.data_criacao DESC`,
+            [id]
+        );
+
+        // Empacota tudo e devolve para o Front-end
+        res.status(200).json({
+            locaisCadastrados: locais.rows,
+            avaliacoesFeitas: avaliacoes.rows
+        });
+        
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).send('Erro ao carregar os dados do perfil.');
+    }
+});
+
 module.exports = router;
