@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../database');
 
+// 1. Rota para buscar os itens de acessibilidade
 router.get('/itens', async (req, res) => {
     try {
         const itens = await pool.query('SELECT * FROM itens_acessibilidade ORDER BY id');
@@ -12,6 +13,7 @@ router.get('/itens', async (req, res) => {
     }
 });
 
+// 2. Rota para buscar todos os locais e seus respectivos selos
 router.get('/', async (req, res) => {
     try {
         const query = `
@@ -36,6 +38,7 @@ router.get('/', async (req, res) => {
     }
 });
 
+// 3. Rota para cadastrar um local
 router.post('/cadastrar', async (req, res) => {
     const { nome, endereco, categoria, imagem_url, itens, usuario_id } = req.body;
 
@@ -63,7 +66,7 @@ router.post('/cadastrar', async (req, res) => {
     }
 });
 
-// NOVA ROTA: Excluir Estabelecimento
+// 4. Rota para excluir estabelecimento
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -72,6 +75,38 @@ router.delete('/:id', async (req, res) => {
     } catch (erro) {
         console.error(erro);
         res.status(500).send('Erro ao excluir o local.');
+    }
+});
+
+// 5. NOVA ROTA: Atualizar/Editar um Local existente
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nome, endereco, categoria, imagem_url, itens } = req.body;
+
+    try {
+        // Atualiza as informações básicas na tabela de estabelecimentos
+        await pool.query(
+            'UPDATE estabelecimentos SET nome = $1, endereco = $2, categoria = $3, imagem_url = $4 WHERE id = $5',
+            [nome, endereco, categoria, imagem_url, id]
+        );
+
+        // Limpa os selos antigos na tabela ponte para reescrever os novos
+        await pool.query('DELETE FROM estabelecimento_itens WHERE estabelecimento_id = $1', [id]);
+
+        // Insere os novos selos selecionados pelo usuário
+        if (itens && itens.length > 0) {
+            for (let itemId of itens) {
+                await pool.query(
+                    'INSERT INTO estabelecimento_itens (estabelecimento_id, item_id) VALUES ($1, $2)',
+                    [id, itemId]
+                );
+            }
+        }
+
+        res.status(200).send('Local atualizado com sucesso!');
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).send('Erro ao atualizar o local.');
     }
 });
 

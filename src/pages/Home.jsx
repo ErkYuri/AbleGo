@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import CardLocal from '../components/CardLocal';
 import ModalDetalhes from '../components/ModalDetalhes';
+import ModalEditar from '../components/ModalEditar'; // 1. IMPORTA O NOVO MODAL
 import Footer from '../components/Footer';
 import './Home.css'; 
 
@@ -10,42 +11,40 @@ function Home() {
   const [erro, setErro] = useState('');
   const [localSelecionado, setLocalSelecionado] = useState(null);
   
+  // 2. NOVO ESTADO: Para saber qual local está sendo editado no momento
+  const [localEmEdicao, setLocalEmEdicao] = useState(null);
+  
   const [busca, setBusca] = useState('');
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Todos');
-  
-  // NOVO: Estado para saber quem está logado
   const [usuarioLogado, setUsuarioLogado] = useState(null);
 
+  // Isolamos a função de busca de locais para podermos chamá-la de novo após uma edição com sucesso
+  const carregarDadosDoServidor = async () => {
+    try {
+      const resposta = await fetch('http://localhost:3000/api/locais');
+      if (resposta.ok) {
+        const dados = await resposta.json();
+        setLocais(dados);
+      } else {
+        setErro('Falha ao carregar os estabelecimentos.');
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      setErro('Não foi possível conectar ao servidor.');
+    } finally {
+      setCarregando(false);
+    }
+  };
+
   useEffect(() => {
-    // Carrega o usuário do localStorage
     const usuarioSalvo = localStorage.getItem('usuario');
     if (usuarioSalvo) {
       setUsuarioLogado(JSON.parse(usuarioSalvo));
     }
-
-    const buscarLocais = async () => {
-      try {
-        const resposta = await fetch('http://localhost:3000/api/locais');
-        if (resposta.ok) {
-          const dados = await resposta.json();
-          setLocais(dados);
-        } else {
-          setErro('Falha ao carregar os estabelecimentos.');
-        }
-      } catch (error) {
-        console.error('Erro:', error);
-        setErro('Não foi possível conectar ao servidor.');
-      } finally {
-        setCarregando(false);
-      }
-    };
-
-    buscarLocais();
+    carregarDadosDoServidor();
   }, []);
 
-  // NOVO: Função para deletar estabelecimento
   const handleExcluir = async (id, nome) => {
-    // Pede confirmação antes de apagar
     const confirmacao = window.confirm(`Tem certeza que deseja excluir permanentemente o local "${nome}"?`);
     
     if (confirmacao) {
@@ -55,7 +54,6 @@ function Home() {
         });
 
         if (resposta.ok) {
-          // Remove da tela sem precisar recarregar a página
           setLocais((locaisAnteriores) => locaisAnteriores.filter(local => local.id !== id));
         } else {
           alert('Erro ao tentar excluir o local.');
@@ -67,11 +65,12 @@ function Home() {
     }
   };
 
-  const handleEditar = () => {
-    alert("A tela de edição será implementada na próxima etapa!");
+  // 3. ATUALIZADO: Salva o local inteiro no estado para abrir o modal de edição
+  const handleAbrirEdicao = (local) => {
+    setLocalEmEdicao(local);
   };
 
-  const locaisFiltrados = locais.filter((local) => {
+  const locaisFiltrados = locales => locais.filter((local) => {
     const combinaCategoria = categoriaSelecionada === 'Todos' || local.categoria === categoriaSelecionada;
     const combinaBusca = 
       local.nome.toLowerCase().includes(busca.toLowerCase()) || 
@@ -87,7 +86,7 @@ function Home() {
           Sua cidade <span className="text-highlight">sem barreiras.</span>
         </h1>
         <p className="home-subtitle">
-          Encontre e avalie a acessibilidade de restaurantes, parques e pontos culturais perto de você.
+          Encontre e avalie a acessibilidade de restaurantes, parks e pontos culturais perto de você.
         </p>
 
         <div className="search-container" role="search">
@@ -125,12 +124,12 @@ function Home() {
 
           {carregando && <p className="status-msg" aria-live="polite">Buscando locais...</p>}
           {erro && <p className="status-msg erro" role="alert">{erro}</p>}
-          {!carregando && !erro && locaisFiltrados.length === 0 && (
+          {!carregando && !erro && locaisFiltrados(locais).length === 0 && (
             <p className="status-msg">Nenhum estabelecimento encontrado com esses termos. 🔍</p>
           )}
 
           <div className="cards-grid">
-            {locaisFiltrados.map((local) => (
+            {locaisFiltrados(locais).map((local) => (
               <CardLocal 
                 key={local.id}
                 id={local.id}
@@ -139,14 +138,13 @@ function Home() {
                 nota="Novo"
                 imagem={local.imagem_url || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80"}
                 acessibilidade={local.acessibilidade} 
-                
-                // Passa as informações de dono para o card verificar
                 donoId={local.usuario_id}
                 usuarioLogadoId={usuarioLogado ? usuarioLogado.id : null}
-                
                 onAbrirModal={() => setLocalSelecionado(local)}
                 onExcluir={handleExcluir}
-                onEditar={handleEditar}
+                
+                // Passa o objeto 'local' inteiro para sabermos qual linha editar
+                onEditar={() => handleAbrirEdicao(local)} 
               />
             ))}
           </div>
@@ -157,6 +155,15 @@ function Home() {
         <ModalDetalhes 
           local={localSelecionado} 
           fecharModal={() => setLocalSelecionado(null)} 
+        />
+      )}
+
+      {/* 4. SE O ESTADO CONTER UM LOCAL, ABRE O MODAL DE EDIÇÃO */}
+      {localEmEdicao && (
+        <ModalEditar 
+          local={localEmEdicao} 
+          fecharModal={() => setLocalEmEdicao(null)} 
+          onSalvarSucesso={carregarDadosDoServidor} // Puxa a lista nova na tela na hora
         />
       )}
 
