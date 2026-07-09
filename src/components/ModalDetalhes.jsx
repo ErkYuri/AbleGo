@@ -8,7 +8,6 @@ function ModalDetalhes({ local, fecharModal }) {
   const [carregando, setCarregando] = useState(false);
   const [usuarioLogado, setUsuarioLogado] = useState(null);
 
-  // Busca o usuário logado e as avaliações deste local assim que o modal abre
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem('usuario');
     if (usuarioSalvo) {
@@ -32,6 +31,27 @@ function ModalDetalhes({ local, fecharModal }) {
 
   if (!local) return null;
 
+  // NOVO: Função de Compartilhar
+  const handleCompartilhar = async () => {
+    const dadosCompartilhamento = {
+      title: `AbleGo - ${local.nome}`,
+      text: `Confira a acessibilidade de ${local.nome} no AbleGo!`,
+      url: window.location.href, // Pega o link atual da página
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(dadosCompartilhamento);
+      } else {
+        // Fallback para PCs antigos: copia o link
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Link copiado para a área de transferência!');
+      }
+    } catch (error) {
+      console.log('Compartilhamento cancelado ou falhou', error);
+    }
+  };
+
   const handleEnviarAvaliacao = async (e) => {
     e.preventDefault();
     if (!usuarioLogado) return alert("Faça login para avaliar!");
@@ -49,9 +69,7 @@ function ModalDetalhes({ local, fecharModal }) {
       });
 
       if (resposta.ok) {
-        // Atualiza a lista na hora, limpando o formulário
         const novaData = await resposta.json();
-        // Injetamos o nome do usuário logado na avaliação recém-criada para aparecer na tela
         novaData.nome_usuario = usuarioLogado.nome; 
         setAvaliacoes([novaData, ...avaliacoes]);
         setComentario('');
@@ -76,10 +94,24 @@ function ModalDetalhes({ local, fecharModal }) {
         </div>
 
         <div className="modal-body">
-          <h2 className="modal-nome">{local.nome}</h2>
-          <p className="modal-endereco">📍 {local.endereco}</p>
+          {/* NOVO: Div para alinhar o Título e o Botão de Compartilhar */}
+          <div className="modal-header-flex">
+            <div>
+              <h2 className="modal-nome">{local.nome}</h2>
+              <p className="modal-endereco">📍 {local.endereco}</p>
+            </div>
+            <button className="btn-compartilhar" onClick={handleCompartilhar} aria-label="Compartilhar este local">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+              Compartilhar
+            </button>
+          </div>
 
-          {/* Área 1: Checklist de Acessibilidade */}
           <div className="modal-section">
             <h3 className="modal-section-title">Checklist de Acessibilidade</h3>
             {local.acessibilidade && local.acessibilidade.length > 0 ? (
@@ -95,11 +127,9 @@ function ModalDetalhes({ local, fecharModal }) {
             )}
           </div>
 
-          {/* Área 2: Avaliações */}
           <div className="modal-section reviews-section">
             <h3 className="modal-section-title">Avaliações da Comunidade</h3>
             
-            {/* Formulário para quem está logado */}
             {usuarioLogado ? (
               <form onSubmit={handleEnviarAvaliacao} className="review-form">
                 <div className="stars-selector">
@@ -122,6 +152,7 @@ function ModalDetalhes({ local, fecharModal }) {
                   className="review-textarea"
                   rows="3"
                 ></textarea>
+                {/* Botão de Envio destravado para enviar só estrelas */}
                 <button type="submit" className="btn-enviar-review" disabled={carregando}>
                   {carregando ? 'Enviando...' : 'Publicar Avaliação'}
                 </button>
@@ -132,7 +163,6 @@ function ModalDetalhes({ local, fecharModal }) {
               </div>
             )}
 
-            {/* Lista de Comentários */}
             <div className="reviews-list">
               {avaliacoes.length > 0 ? (
                 avaliacoes.map(av => (

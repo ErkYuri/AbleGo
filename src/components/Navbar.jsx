@@ -3,6 +3,7 @@ import './Navbar.css';
 
 function Navbar() {
   const [usuarioLogado, setUsuarioLogado] = useState(null);
+  const [altoContraste, setAltoContraste] = useState(false);
 
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem('usuario');
@@ -10,6 +11,16 @@ function Navbar() {
       setUsuarioLogado(JSON.parse(usuarioSalvo));
     }
   }, []);
+
+  const toggleAltoContraste = () => {
+    const novoEstado = !altoContraste;
+    setAltoContraste(novoEstado);
+    if (novoEstado) {
+      document.body.classList.add('alto-contraste');
+    } else {
+      document.body.classList.remove('alto-contraste');
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -20,7 +31,7 @@ function Navbar() {
   return (
     <nav className="navbar-container" aria-label="Navegação principal">
       
-      {/* NOVO: Grupo da Esquerda (Logo + Saudação) */}
+      {/* GRUPO DA ESQUERDA */}
       <div className="navbar-left-group">
         <a href="/" className="navbar-logo-link" aria-label="Ir para a página inicial do AbleGo">
           <img src="/logo-mini-nobg.png" alt="" className="navbar-logo-img" aria-hidden="true" />
@@ -32,13 +43,23 @@ function Navbar() {
             Olá, {usuarioLogado.nome.split(' ')[0]}
           </span>
         )}
-      </div>
 
-      {/* Grupo da Direita (Ações) */}
-      <div className="navbar-actions">
-        <a href="/cadastro" className="nav-link" aria-label="Acessar formulário para cadastrar um novo local">
+        {/* MUDANÇA AQUI: Botão de Cadastrar Local movido para cá, com a classe btn-login */}
+        <a href="/cadastro" className="btn-login" aria-label="Acessar formulário para cadastrar um novo local">
           + Cadastrar Local
         </a>
+      </div>
+
+      {/* GRUPO DA DIREITA */}
+      <div className="navbar-actions">
+        <button 
+          className="nav-link btn-contraste" 
+          onClick={toggleAltoContraste}
+          aria-label="Alternar modo de alto contraste"
+          title="Alto Contraste"
+        >
+          {altoContraste ? '☀️ Modo Normal' : '🌓 Alto Contraste'}
+        </button>
         
         <button className="nav-link" aria-label="Abrir central de ajuda">
           Ajuda

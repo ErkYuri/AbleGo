@@ -257,3 +257,39 @@
   line-height: 1.4;
   margin: 0;
 }
+
+/* --- Estilos do Botão Compartilhar --- */
+.modal-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.modal-header-flex .modal-nome {
+  margin-bottom: 0.2rem;
+}
+
+.btn-compartilhar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: #f1f5f9;
+  color: #1a2b4c;
+  border: 1px solid #cbd5e1;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-compartilhar:hover {
+  background-color: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.btn-compartilhar svg {
+  color: #f47b20;
+}

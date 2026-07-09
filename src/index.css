@@ -9,3 +9,20 @@
 body {
   background-color: #f8fafc;
 }
+
+/* --- MÁGICA DO ALTO CONTRASTE --- */
+body.alto-contraste {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: #111111;
+}
+
+/* Evita que as imagens fiquem com as cores invertidas como um raio-X */
+body.alto-contraste img {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Opcional: Garante que o fundo do modal ou popups não fique branco demais no contraste */
+body.alto-contraste .modal-overlay,
+body.alto-contraste .modal-editar-overlay {
+  background-color: rgba(255, 255, 255, 0.2);
+}
