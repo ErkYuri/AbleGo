@@ -1,61 +1,78 @@
 import './CardLocal.css';
 
-function CardLocal({ nome, categoria, nota, imagem, tagVerde, iconeVerde, tagVermelha, extras, onAbrirModal }) {
+function CardLocal({ id, nome, categoria, nota, imagem, acessibilidade = [], donoId, usuarioLogadoId, onAbrirModal, onExcluir, onEditar }) {
+  const MAX_ITENS = 2;
+  const itensVisiveis = acessibilidade.slice(0, MAX_ITENS);
+  const quantidadeOculta = acessibilidade.length - MAX_ITENS;
+
+  // Verifica se o usuário atual é o criador deste local
+  const isDono = usuarioLogadoId && usuarioLogadoId === donoId;
+
   return (
-    <div className="card-container">
+    <article className="card-local" onClick={onAbrirModal} aria-label={`Detalhes de ${nome}`}>
       
-      {/* 1. Bloco da Foto */}
-      <div className="card-image-wrapper">
-        <img 
-          src={imagem} 
-          alt={`Foto de ${nome}`} 
-          className="card-img"
-        />
-        <span className="card-category">
-          {categoria}
-        </span>
-        <div className="card-rating">
-          <span className="rating-star">⭐</span> {nota}
-        </div>
+      <div className="card-img-container">
+        <img src={imagem} alt={`Foto de ${nome}`} className="card-img" />
+        <span className="card-categoria">{categoria}</span>
+        <div className="card-nota">⭐ {nota}</div>
       </div>
       
-      {/* 2. Bloco dos Textos */}
-      <div className="card-content">
-        <h3 className="card-title">{nome}</h3>
-        
-        <p className="checklist-label">
-          Checklist de Acessibilidade
-        </p>
-
-        <div className="badges-container">
+      <div className="card-info">
+        {/* Cabeçalho do Card com Título e Botões alinhados */}
+        <div className="card-header-flex">
+          <h3 className="card-nome">{nome}</h3>
           
-          {/* Selo Verde */}
-          <div className="badge-green">
-            <span>{iconeVerde}</span> {tagVerde}
-          </div>
-
-          {/* Selo Vermelho */}
-          {tagVermelha && (
-            <div className="badge-red">
-              <span>❌</span> {tagVermelha}
-            </div>
-          )}
-
-          {/* Botão de Extras */}
-          {extras && (
-            <div className="extras-container">
+          {/* Só mostra os botões se o usuário for o dono */}
+          {isDono && (
+            <div className="card-actions">
               <button 
-                onClick={onAbrirModal}
-                className="btn-extras"
+                className="btn-icon btn-edit" 
+                title="Editar"
+                onClick={(e) => {
+                  e.stopPropagation(); // Evita que o modal abra
+                  onEditar();
+                }}
               >
-                +{extras}
+                {/* Ícone de Lápis */}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </button>
+              
+              <button 
+                className="btn-icon btn-delete" 
+                title="Excluir"
+                onClick={(e) => {
+                  e.stopPropagation(); // Evita que o modal abra
+                  onExcluir(id, nome);
+                }}
+              >
+                {/* Ícone de Lixeira */}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
               </button>
             </div>
           )}
+        </div>
+        
+        <span className="checklist-title">CHECKLIST DE ACESSIBILIDADE</span>
+        
+        <div className="tags-container">
+          {itensVisiveis.map((item) => (
+            <div key={item.id} className="tag-verde" aria-label={`Possui ${item.nome}`}>
+              <span aria-hidden="true">{item.icone}</span> {item.nome}
+            </div>
+          ))}
 
+          {quantidadeOculta > 0 && (
+            <div className="tag-extra" aria-label={`Mais ${quantidadeOculta} itens disponíveis`}>
+              +{quantidadeOculta}
+            </div>
+          )}
+
+          {acessibilidade.length === 0 && (
+            <div className="tag-neutra">Nenhum item informado</div>
+          )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 

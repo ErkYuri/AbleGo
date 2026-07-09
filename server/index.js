@@ -1,17 +1,21 @@
 const express = require('express');
-const cors = require('cors'); // 1. Trazendo o segurança VIP
+const cors = require('cors'); 
 const app = express();
 const pool = require('./database');
+
+// Importação das rotas
 const rotasLocais = require('./routes/locais'); 
+const rotasUsuarios = require('./routes/usuarios'); // NOVO AQUI
 
 const PORT = 3000;
 
-// 2. Avisando o servidor para liberar a entrada (o CORS tem que vir ANTES das rotas!)
 app.use(cors()); 
 app.use(express.json());
-app.use('/api/locais', rotasLocais); 
 
-// criando rota teste
+// Avisando o app para usar as rotas
+app.use('/api/locais', rotasLocais); 
+app.use('/api/usuarios', rotasUsuarios); // NOVO AQUI
+
 app.get('/teste-banco', async (req, res) => {
     try {
         const resultado = await pool.query('SELECT NOW()');
@@ -22,7 +26,6 @@ app.get('/teste-banco', async (req, res) => {
     }
 });
 
-// conectando
 app.listen(PORT, () => {
     console.log(`Servidor conectado! Porta: ${PORT}`);
 });

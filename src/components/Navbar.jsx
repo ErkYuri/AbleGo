@@ -1,25 +1,31 @@
+import { useState, useEffect } from 'react';
 import './Navbar.css';
 
 function Navbar() {
-  // O aria-label na tag nav identifica a região para quem navega por atalhos de teclado
+  const [usuarioLogado, setUsuarioLogado] = useState(null);
+
+  // Assim que a Navbar aparece, ela checa o "bolso" do navegador
+  useEffect(() => {
+    const usuarioSalvo = localStorage.getItem('usuario');
+    if (usuarioSalvo) {
+      setUsuarioLogado(JSON.parse(usuarioSalvo));
+    }
+  }, []);
+
+  // Função para fazer logout (jogar o crachá fora)
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
+    window.location.href = '/'; // Recarrega a página inicial
+  };
+
   return (
     <nav className="navbar-container" aria-label="Navegação principal">
       
       <div className="navbar-logo-area">
-        <a 
-          href="/" 
-          className="navbar-logo-link"
-          aria-label="Ir para a página inicial do AbleGo"
-        >
-          <img 
-            src="/logo-mini-nobg.png" 
-            alt="" 
-            className="navbar-logo-img" 
-            aria-hidden="true"
-          />
-          <span className="navbar-brand-name">
-            AbleGo
-          </span>
+        <a href="/" className="navbar-logo-link" aria-label="Ir para a página inicial do AbleGo">
+          <img src="/logo-mini-nobg.png" alt="" className="navbar-logo-img" aria-hidden="true" />
+          <span className="navbar-brand-name">AbleGo</span>
         </a>
       </div>
 
@@ -32,9 +38,22 @@ function Navbar() {
           Ajuda
         </button>
 
-        <button className="btn-login" aria-label="Fazer login no sistema">
-          Entrar
-        </button>
+        {/* Lógica Mágica: Se tem usuário, mostra o nome dele. Se não tem, mostra o botão de Entrar */}
+        {usuarioLogado ? (
+          <div className="user-menu">
+            {/* Pega apenas o primeiro nome da pessoa */}
+            <span className="user-greeting">
+              Olá, {usuarioLogado.nome.split(' ')[0]}
+            </span>
+            <button onClick={handleLogout} className="btn-logout" aria-label="Sair da conta">
+              Sair
+            </button>
+          </div>
+        ) : (
+          <a href="/login" className="btn-login" aria-label="Fazer login no sistema">
+            Entrar
+          </a>
+        )}
       </div>
     </nav>
   );

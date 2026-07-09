@@ -1,135 +1,136 @@
-/* Fundo escuro e desfocado do Modal */
+/* Fundo escuro com desfoque */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 50;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.7); 
   display: flex;
-  align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.6); /* bg-black/60 */
-  backdrop-filter: blur(4px); /* backdrop-blur-sm */
+  align-items: center;
+  z-index: 100; /* Garante que fique por cima da Navbar */
   padding: 1rem;
 }
 
-/* A Caixa Branca do Modal */
+/* O cartão branco da janela */
 .modal-content {
   background-color: #ffffff;
-  border-radius: 1.5rem; /* rounded-3xl */
+  border-radius: 12px;
   width: 100%;
-  max-width: 28rem; /* max-w-md */
-  overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl */
-  transform: scale(1);
-  transition: all 0.3s ease;
-}
-
-/* Header (Foto + Botão) */
-.modal-header {
+  max-width: 500px;
+  max-height: 90vh; /* Se o conteúdo for muito grande, ele não passa da tela */
+  overflow-y: auto; /* Cria barra de rolagem interna se precisar */
   position: relative;
-  height: 12rem; /* h-48 */
-  width: 100%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
 }
 
-.modal-image {
+/* Botão de X para fechar */
+.modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: #ffffff;
+  color: #1e293b;
+  border: none;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background-color: #fef2f2; /* Vermelho super claro */
+  color: #b91c1c;
+  transform: scale(1.05);
+}
+
+/* Imagem de Capa do Modal */
+.modal-img-container {
+  position: relative;
+  width: 100%;
+  height: 220px;
+}
+
+.modal-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.modal-close-btn {
+.modal-categoria {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background-color: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(4px);
-  color: #1e293b;
-  padding: 0.5rem 0.75rem;
+  bottom: -15px;
+  left: 1.5rem;
+  background-color: #f47b20; /* Laranja padrão */
+  color: #ffffff;
+  padding: 0.4rem 1rem;
   border-radius: 9999px;
-  border: none;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 1rem;
-  line-height: 1;
-}
-
-.modal-close-btn:hover {
-  background-color: #ffffff;
-}
-
-.modal-close-btn:active {
-  transform: scale(0.95);
-}
-
-/* Corpo e Textos do Modal */
-.modal-body {
-  padding: 1.5rem; /* p-6 */
-}
-
-.modal-title {
-  font-size: 1.5rem; /* text-2xl */
-  font-weight: 800; /* font-extrabold */
-  color: #1e293b; /* text-slate-800 */
-  margin: 0 0 0.25rem 0;
-}
-
-.modal-category {
-  font-size: 0.875rem; /* text-sm */
-  font-weight: 700;
-  color: #ea580c; /* text-orange-600 */
-  letter-spacing: 0.05em;
+  font-size: 0.8rem;
+  font-weight: bold;
   text-transform: uppercase;
-  margin: 0 0 1.5rem 0; /* mb-6 */
+  border: 3px solid #ffffff;
 }
 
-.modal-checklist-title {
-  font-weight: 700;
-  color: #334155; /* text-slate-700 */
-  margin: 0 0 1rem 0; /* mb-4 */
-  border-bottom: 1px solid #e2e8f0; /* border-b */
-  padding-bottom: 0.5rem; /* pb-2 */
+/* Corpo do Texto */
+.modal-body {
+  padding: 2.5rem 1.5rem 1.5rem 1.5rem;
 }
 
-/* Lista de Checklist */
+.modal-nome {
+  font-size: 1.6rem;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.modal-endereco {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.modal-section-title {
+  font-size: 0.9rem;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Lista de Acessibilidade */
 .modal-checklist {
   list-style: none;
   padding: 0;
-  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem; /* space-y-3 */
+  gap: 0.75rem;
 }
 
-.checklist-item {
+.modal-check-item {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid transparent;
 }
 
-/* Variação Verde */
-.checklist-green {
-  color: #166534; /* text-green-800 */
-  background-color: rgba(240, 253, 244, 0.5); /* bg-green-50/50 */
-  border-color: #dcfce3; /* border-green-100 */
-}
-
-/* Variação Vermelha */
-.checklist-red {
-  color: #991b1b; /* text-red-800 */
-  background-color: rgba(254, 242, 242, 0.5); /* bg-red-50/50 */
-  border-color: #fee2e2; /* border-red-100 */
-}
-
-.checklist-icon {
-  font-size: 1.25rem; /* text-xl */
-}
-
-.checklist-text {
-  font-weight: 600; /* font-semibold */
+.modal-empty-msg {
+  color: #94a3b8;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
 }

@@ -9,9 +9,20 @@ function Home() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [localSelecionado, setLocalSelecionado] = useState(null);
+  
+  const [busca, setBusca] = useState('');
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState('Todos');
+  
+  // NOVO: Estado para saber quem está logado
+  const [usuarioLogado, setUsuarioLogado] = useState(null);
 
-  // O useEffect funciona como um "mensageiro" que vai buscar os dados no back-end
   useEffect(() => {
+    // Carrega o usuário do localStorage
+    const usuarioSalvo = localStorage.getItem('usuario');
+    if (usuarioSalvo) {
+      setUsuarioLogado(JSON.parse(usuarioSalvo));
+    }
+
     const buscarLocais = async () => {
       try {
         const resposta = await fetch('http://localhost:3000/api/locais');
@@ -32,12 +43,46 @@ function Home() {
     buscarLocais();
   }, []);
 
+  // NOVO: Função para deletar estabelecimento
+  const handleExcluir = async (id, nome) => {
+    // Pede confirmação antes de apagar
+    const confirmacao = window.confirm(`Tem certeza que deseja excluir permanentemente o local "${nome}"?`);
+    
+    if (confirmacao) {
+      try {
+        const resposta = await fetch(`http://localhost:3000/api/locais/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (resposta.ok) {
+          // Remove da tela sem precisar recarregar a página
+          setLocais((locaisAnteriores) => locaisAnteriores.filter(local => local.id !== id));
+        } else {
+          alert('Erro ao tentar excluir o local.');
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        alert('Falha na comunicação com o servidor.');
+      }
+    }
+  };
+
+  const handleEditar = () => {
+    alert("A tela de edição será implementada na próxima etapa!");
+  };
+
+  const locaisFiltrados = locais.filter((local) => {
+    const combinaCategoria = categoriaSelecionada === 'Todos' || local.categoria === categoriaSelecionada;
+    const combinaBusca = 
+      local.nome.toLowerCase().includes(busca.toLowerCase()) || 
+      local.endereco.toLowerCase().includes(busca.toLowerCase());
+    return combinaCategoria && combinaBusca;
+  });
+
   return (
     <div className="home-container">
-      {/* Container Principal */}
       <main className="home-main">
         
-        {/* Título de Impacto */}
         <h1 className="home-title">
           Sua cidade <span className="text-highlight">sem barreiras.</span>
         </h1>
@@ -45,21 +90,20 @@ function Home() {
           Encontre e avalie a acessibilidade de restaurantes, parques e pontos culturais perto de você.
         </p>
 
-        {/* Barra de Pesquisa Moderna */}
         <div className="search-container" role="search">
           <div className="search-icon" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
           </div>
-
           <input 
             type="text" 
             placeholder="Para onde deseja ir?" 
             className="search-input"
             aria-label="Buscar estabelecimentos"
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)} 
           />
-
           <button className="search-button" aria-label="Pesquisar">
             <span className="search-text">Buscar</span>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="search-btn-icon" aria-hidden="true">
@@ -68,49 +112,47 @@ function Home() {
           </button>
         </div>
 
-        {/* Filtros em Pílulas */}
         <div className="filters-container" aria-label="Filtros de categoria">
-          <button className="filter-btn active">📍 Todos</button>
-          <button className="filter-btn">🍽️ Restaurantes</button>
-          <button className="filter-btn">☕ Cafés</button>
-          <button className="filter-btn">🏛️ Museus</button>
-          <button className="filter-btn">🌳 Parques</button>
+          <button className={`filter-btn ${categoriaSelecionada === 'Todos' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Todos')}>📍 Todos</button>
+          <button className={`filter-btn ${categoriaSelecionada === 'Restaurantes' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Restaurantes')}>🍽️ Restaurantes</button>
+          <button className={`filter-btn ${categoriaSelecionada === 'Cafés' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Cafés')}>☕ Cafés</button>
+          <button className={`filter-btn ${categoriaSelecionada === 'Museus' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Museus')}>🏛️ Museus</button>
+          <button className={`filter-btn ${categoriaSelecionada === 'Parques' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Parques')}>🌳 Parques</button>
         </div>
 
-        {/* Bloco dos Cards - Integrado com o Banco de Dados */}
         <div className="cards-section" aria-label="Lista de estabelecimentos">
           <h2 className="cards-title">Locais em Destaque</h2>
 
-          {/* Tratamento de Estados (Carregando, Erro, Vazio) */}
           {carregando && <p className="status-msg" aria-live="polite">Buscando locais...</p>}
-          
           {erro && <p className="status-msg erro" role="alert">{erro}</p>}
-
-          {!carregando && !erro && locais.length === 0 && (
-            <p className="status-msg">Nenhum local cadastrado ainda. Seja o primeiro a contribuir!</p>
+          {!carregando && !erro && locaisFiltrados.length === 0 && (
+            <p className="status-msg">Nenhum estabelecimento encontrado com esses termos. 🔍</p>
           )}
 
           <div className="cards-grid">
-            {locais.map((local) => (
+            {locaisFiltrados.map((local) => (
               <CardLocal 
                 key={local.id}
+                id={local.id}
                 nome={local.nome}
                 categoria={local.categoria}
-                // Como ainda não temos avaliações no banco, passamos valores temporários para o seu layout não quebrar
                 nota="Novo"
                 imagem={local.imagem_url || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80"}
-                tagVerde="Acessibilidade"
-                iconeVerde="♿"
-                tagVermelha="A avaliar"
-                extras="+"
+                acessibilidade={local.acessibilidade} 
+                
+                // Passa as informações de dono para o card verificar
+                donoId={local.usuario_id}
+                usuarioLogadoId={usuarioLogado ? usuarioLogado.id : null}
+                
                 onAbrirModal={() => setLocalSelecionado(local)}
+                onExcluir={handleExcluir}
+                onEditar={handleEditar}
               />
             ))}
           </div>
         </div>
       </main>
 
-      {/* Renderiza o Modal apenas se houver um local selecionado */}
       {localSelecionado && (
         <ModalDetalhes 
           local={localSelecionado} 
