@@ -113,7 +113,7 @@ function ModalDetalhes({ local, fecharModal }) {
           </div>
 
           <div className="modal-section">
-            <h3 className="modal-section-title">Checklist de Acessibilidade</h3>
+            <h3 className="modal-section-title">Recursos Encontrados</h3>
             {local.acessibilidade && local.acessibilidade.length > 0 ? (
               <div className="modal-checklist-grid">
                 {local.acessibilidade.map((item) => (

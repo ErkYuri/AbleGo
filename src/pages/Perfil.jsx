@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import ModalEditar from '../components/ModalEditar'; // IMPORTA O MODAL DE EDIÇÃO DE LOCAIS
 import './Perfil.css';
 
 function Perfil() {
@@ -6,32 +7,40 @@ function Perfil() {
   const [dadosPerfil, setDadosPerfil] = useState({ locaisCadastrados: [], avaliacoesFeitas: [] });
   const [carregando, setCarregando] = useState(true);
 
-  // Estados para a edição
+  // Estados para edição do perfil
   const [modoEdicao, setModoEdicao] = useState(false);
   const [formData, setFormData] = useState({ nome: '', email: '', pcd: false });
   const [salvando, setSalvando] = useState(false);
+
+  // Estados para edição de avaliação
+  const [avaliacaoEmEdicao, setAvaliacaoEmEdicao] = useState(null);
+  const [editNota, setEditNota] = useState(5);
+  const [editComentario, setEditComentario] = useState('');
+
+  // Estados para edição de local
+  const [localEmEdicao, setLocalEmEdicao] = useState(null);
+
+  const carregarDadosDoPerfil = async (idUsuario) => {
+    try {
+      const resposta = await fetch(`http://localhost:3000/api/usuarios/${idUsuario}/perfil`);
+      if (resposta.ok) {
+        const dados = await resposta.json();
+        setDadosPerfil(dados);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar perfil:', error);
+    } finally {
+      setCarregando(false);
+    }
+  };
 
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem('usuario');
     if (usuarioSalvo) {
       const userObj = JSON.parse(usuarioSalvo);
       setUsuario(userObj);
-      setFormData({ nome: userObj.nome, email: userObj.email, pcd: userObj.pcd }); // Preenche o form
-
-      const buscarPerfil = async () => {
-        try {
-          const resposta = await fetch(`http://localhost:3000/api/usuarios/${userObj.id}/perfil`);
-          if (resposta.ok) {
-            const dados = await resposta.json();
-            setDadosPerfil(dados);
-          }
-        } catch (error) {
-          console.error('Erro ao buscar perfil:', error);
-        } finally {
-          setCarregando(false);
-        }
-      };
-      buscarPerfil();
+      setFormData({ nome: userObj.nome, email: userObj.email, pcd: userObj.pcd });
+      carregarDadosDoPerfil(userObj.id);
     } else {
       window.location.href = '/login'; 
     }
@@ -39,16 +48,12 @@ function Perfil() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
+    setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
   };
 
-  const handleSalvar = async (e) => {
+  const handleSalvarPerfil = async (e) => {
     e.preventDefault();
     setSalvando(true);
-
     try {
       const resposta = await fetch(`http://localhost:3000/api/usuarios/${usuario.id}`, {
         method: 'PUT',
@@ -58,12 +63,9 @@ function Perfil() {
 
       if (resposta.ok) {
         const usuarioAtualizado = await resposta.json();
-        // Atualiza a tela e a memória do navegador
         setUsuario(usuarioAtualizado);
         localStorage.setItem('usuario', JSON.stringify(usuarioAtualizado));
-        setModoEdicao(false); // Fecha o modo de edição
-        
-        // Recarrega a página para atualizar o nome na Navbar lá em cima
+        setModoEdicao(false); 
         window.location.reload(); 
       } else {
         alert('Erro ao atualizar perfil.');
@@ -71,6 +73,89 @@ function Perfil() {
     } catch (error) {
       console.error(error);
       alert('Falha na comunicação com o servidor.');
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  // --- FUNÇÕES DE LOCAIS ---
+
+  const handleExcluirLocal = async (id, nome) => {
+    if (window.confirm(`Tem certeza que deseja excluir permanentemente o local "${nome}"?`)) {
+      try {
+        const resposta = await fetch(`http://localhost:3000/api/locais/${id}`, { method: 'DELETE' });
+        if (resposta.ok) {
+          setDadosPerfil(prev => ({
+            ...prev,
+            locaisCadastrados: prev.locaisCadastrados.filter(loc => loc.id !== id)
+          }));
+        } else {
+          alert('Erro ao excluir local.');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Erro de conexão.');
+      }
+    }
+  };
+
+  // --- FUNÇÕES DE AVALIAÇÃO ---
+
+  const handleExcluirAvaliacao = async (id) => {
+    if (window.confirm('Tem certeza que deseja excluir esta avaliação?')) {
+      try {
+        const resposta = await fetch(`http://localhost:3000/api/locais/avaliacao/${id}`, { method: 'DELETE' });
+        if (resposta.ok) {
+          setDadosPerfil(prev => ({
+            ...prev,
+            avaliacoesFeitas: prev.avaliacoesFeitas.filter(av => av.id !== id)
+          }));
+        } else {
+          alert('Erro ao excluir avaliação.');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Erro de conexão.');
+      }
+    }
+  };
+
+  const abrirEdicaoAvaliacao = (av) => {
+    setAvaliacaoEmEdicao(av);
+    setEditNota(av.nota);
+    setEditComentario(av.comentario || '');
+  };
+
+  const fecharEdicaoAvaliacao = () => {
+    setAvaliacaoEmEdicao(null);
+  };
+
+  const handleSalvarEdicaoAvaliacao = async (e) => {
+    e.preventDefault();
+    setSalvando(true);
+    try {
+      const resposta = await fetch(`http://localhost:3000/api/locais/avaliacao/${avaliacaoEmEdicao.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nota: editNota, comentario: editComentario })
+      });
+
+      if (resposta.ok) {
+        setDadosPerfil(prev => ({
+          ...prev,
+          avaliacoesFeitas: prev.avaliacoesFeitas.map(av => 
+            av.id === avaliacaoEmEdicao.id 
+              ? { ...av, nota: editNota, comentario: editComentario } 
+              : av
+          )
+        }));
+        fecharEdicaoAvaliacao();
+      } else {
+        alert('Erro ao atualizar avaliação.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Erro de conexão.');
     } finally {
       setSalvando(false);
     }
@@ -87,13 +172,13 @@ function Perfil() {
           <h2 className="perfil-page-title">Meu Perfil</h2>
           {!modoEdicao && (
             <button className="btn-editar-perfil" onClick={() => setModoEdicao(true)}>
-              ✏️ Editar
+              ✏️ Editar Perfil
             </button>
           )}
         </div>
 
         {modoEdicao ? (
-          <form onSubmit={handleSalvar} className="perfil-form">
+          <form onSubmit={handleSalvarPerfil} className="perfil-form">
             <div className="form-group">
               <label htmlFor="nome">Nome Completo</label>
               <input type="text" id="nome" name="nome" value={formData.nome} onChange={handleChange} required />
@@ -114,7 +199,7 @@ function Perfil() {
               </button>
               <button type="button" className="btn-cancelar-perfil" onClick={() => {
                 setModoEdicao(false);
-                setFormData({ nome: usuario.nome, email: usuario.email, pcd: usuario.pcd }); // Reseta se cancelar
+                setFormData({ nome: usuario.nome, email: usuario.email, pcd: usuario.pcd }); 
               }}>
                 Cancelar
               </button>
@@ -144,9 +229,22 @@ function Perfil() {
           ) : (
             <div className="perfil-list">
               {dadosPerfil.locaisCadastrados.map(local => (
-                <div key={local.id} className="perfil-list-item">
-                  <strong>{local.nome}</strong>
-                  <span className="perfil-item-categoria">{local.categoria}</span>
+                <div key={local.id} className="perfil-list-item review-item">
+                  
+                  <div className="review-top-row">
+                    {/* NOME E TAG NA ESQUERDA */}
+                    <div className="local-header-left">
+                      <strong>{local.nome}</strong>
+                      <span className="perfil-item-categoria">{local.categoria}</span>
+                    </div>
+                    
+                    {/* BOTÕES ISOLADOS NA DIREITA */}
+                    <div className="review-item-actions">
+                      <button className="btn-action-review edit" onClick={() => setLocalEmEdicao(local)} title="Editar Local">✏️</button>
+                      <button className="btn-action-review delete" onClick={() => handleExcluirLocal(local.id, local.nome)} title="Excluir Local">🗑️</button>
+                    </div>
+                  </div>
+
                 </div>
               ))}
             </div>
@@ -163,13 +261,23 @@ function Perfil() {
             <div className="perfil-list">
               {dadosPerfil.avaliacoesFeitas.map(av => (
                 <div key={av.id} className="perfil-list-item review-item">
-                  <div className="review-item-header">
-                    <strong>{av.nome_local}</strong>
-                    <span className="review-stars">
-                      {"★".repeat(av.nota)}{"☆".repeat(5 - av.nota)}
-                    </span>
+                  
+                  <div className="review-top-row">
+                    <div className="review-header-left">
+                      <strong>{av.nome_local}</strong>
+                      <span className="review-stars">
+                        {"★".repeat(av.nota)}{"☆".repeat(5 - av.nota)}
+                      </span>
+                    </div>
+                    
+                    <div className="review-item-actions">
+                      <button className="btn-action-review edit" onClick={() => abrirEdicaoAvaliacao(av)} title="Editar Avaliação">✏️</button>
+                      <button className="btn-action-review delete" onClick={() => handleExcluirAvaliacao(av.id)} title="Excluir Avaliação">🗑️</button>
+                    </div>
                   </div>
+                  
                   {av.comentario && <p className="review-comentario">"{av.comentario}"</p>}
+
                 </div>
               ))}
             </div>
@@ -177,6 +285,59 @@ function Perfil() {
         </section>
 
       </main>
+
+      {/* MODAL DE EDIÇÃO DE AVALIAÇÃO */}
+      {avaliacaoEmEdicao && (
+        <div className="modal-overlay" onClick={fecharEdicaoAvaliacao}>
+          <div className="modal-content-small" onClick={(e) => e.stopPropagation()}>
+            <h3 className="modal-title">Editar Avaliação</h3>
+            <p className="modal-subtitle">Local: {avaliacaoEmEdicao.nome_local}</p>
+            
+            <form onSubmit={handleSalvarEdicaoAvaliacao} className="review-form">
+              <div className="stars-selector-edit">
+                <span>Nova Nota: </span>
+                {[1, 2, 3, 4, 5].map(num => (
+                  <button 
+                    key={num} 
+                    type="button" 
+                    className={`star-btn ${editNota >= num ? 'active' : ''}`}
+                    onClick={() => setEditNota(num)}
+                  >
+                    ★
+                  </button>
+                ))}
+              </div>
+              
+              <textarea 
+                value={editComentario}
+                onChange={(e) => setEditComentario(e.target.value)}
+                className="review-textarea"
+                rows="4"
+                placeholder="Atualize seu comentário..."
+              ></textarea>
+              
+              <div className="modal-editar-acoes">
+                <button type="button" className="btn-cancelar" onClick={fecharEdicaoAvaliacao}>Cancelar</button>
+                <button type="submit" className="btn-salvar" disabled={salvando}>
+                  {salvando ? 'Salvando...' : 'Salvar Alterações'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE EDIÇÃO DE LOCAL */}
+      {localEmEdicao && (
+        <ModalEditar 
+          local={localEmEdicao} 
+          fecharModal={() => setLocalEmEdicao(null)} 
+          onSalvarSucesso={() => {
+            carregarDadosDoPerfil(usuario.id);
+            setLocalEmEdicao(null);
+          }} 
+        />
+      )}
     </div>
   );
 }

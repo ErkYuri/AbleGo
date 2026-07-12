@@ -2,122 +2,151 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../database');
 
-router.get('/itens', async (req, res) => {
+// 1. Criar um novo local
+router.post('/', async (req, res) => {
+    const { nome, categoria, endereco, imagem_url, acessibilidade, usuario_id } = req.body;
     try {
-        const itens = await pool.query('SELECT * FROM itens_acessibilidade ORDER BY id');
-        res.status(200).json(itens.rows);
-    } catch (erro) {
-        console.error(erro);
-        res.status(500).send('Erro ao buscar itens.');
-    }
-});
-
-// Busca os locais calculando a média de notas e total de avaliações com subconsultas
-router.get('/', async (req, res) => {
-    try {
-        const query = `
-            SELECT 
-                e.*,
-                (SELECT COALESCE(json_agg(json_build_object('id', i.id, 'nome', i.nome, 'icone', i.icone)), '[]')
-                 FROM estabelecimento_itens ei 
-                 JOIN itens_acessibilidade i ON ei.item_id = i.id 
-                 WHERE ei.estabelecimento_id = e.id) as acessibilidade,
-                (SELECT COALESCE(ROUND(AVG(nota), 1), 0) FROM avaliacoes WHERE estabelecimento_id = e.id) as nota_media,
-                (SELECT COUNT(*) FROM avaliacoes WHERE estabelecimento_id = e.id) as total_avaliacoes
-            FROM estabelecimentos e
-            ORDER BY e.id DESC;
-        `;
-        const todosLocais = await pool.query(query);
-        res.status(200).json(todosLocais.rows);
-    } catch (erro) {
-        console.error(erro);
-        res.status(500).send('Erro ao buscar os locais.');
-    }
-});
-
-router.post('/cadastrar', async (req, res) => {
-    const { nome, endereco, categoria, imagem_url, itens, usuario_id } = req.body;
-    try {
+        const arrayAcessibilidade = acessibilidade && acessibilidade.length > 0 ? acessibilidade : [];
         const novoLocal = await pool.query(
-            'INSERT INTO estabelecimentos (nome, endereco, categoria, imagem_url, usuario_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [nome, endereco, categoria, imagem_url, usuario_id || null]
+            'INSERT INTO estabelecimentos (nome, categoria, endereco, imagem_url, acessibilidade, usuario_id) VALUES ($1, $2, $3, $4, $5::INTEGER[], $6) RETURNING *',
+            [nome, categoria, endereco, imagem_url, arrayAcessibilidade, usuario_id]
         );
-        const localId = novoLocal.rows[0].id;
-        if (itens && itens.length > 0) {
-            for (let itemId of itens) {
-                await pool.query('INSERT INTO estabelecimento_itens (estabelecimento_id, item_id) VALUES ($1, $2)', [localId, itemId]);
-            }
-        }
         res.status(201).json(novoLocal.rows[0]);
     } catch (erro) {
-        console.error(erro);
-        res.status(500).send('Erro ao cadastrar.');
+        console.error('🔴 ERRO DETALHADO DO BANCO DE DADOS:', erro);
+        res.status(500).send('Erro ao cadastrar o estabelecimento no banco de dados.');
     }
 });
 
-router.put('/:id', async (req, res) => {
-    const { id } = req.params;
-    const { nome, endereco, categoria, imagem_url, itens } = req.body;
+// 2. Buscar todos os locais
+router.get('/', async (req, res) => {
     try {
-        await pool.query('UPDATE estabelecimentos SET nome = $1, endereco = $2, categoria = $3, imagem_url = $4 WHERE id = $5', [nome, endereco, categoria, imagem_url, id]);
-        await pool.query('DELETE FROM estabelecimento_itens WHERE estabelecimento_id = $1', [id]);
-        if (itens && itens.length > 0) {
-            for (let itemId of itens) {
-                await pool.query('INSERT INTO estabelecimento_itens (estabelecimento_id, item_id) VALUES ($1, $2)', [id, itemId]);
+        const locaisResult = await pool.query(`
+            SELECT e.*, COALESCE(AVG(a.nota), 0) as nota_media, COUNT(a.id) as total_avaliacoes
+            FROM estabelecimentos e
+            LEFT JOIN avaliacoes a ON e.id = a.estabelecimento_id
+            GROUP BY e.id ORDER BY e.id DESC
+        `);
+        const itensResult = await pool.query('SELECT * FROM itens_acessibilidade');
+        const todosItens = itensResult.rows;
+
+        const locaisFormatados = locaisResult.rows.map(local => {
+            let itensDoLocal = [];
+            if (local.acessibilidade && local.acessibilidade.length > 0) {
+                itensDoLocal = local.acessibilidade.map(idItem => todosItens.find(i => i.id === idItem)).filter(i => i != null);
             }
-        }
-        res.status(200).send('Atualizado com sucesso!');
+            return {
+                ...local,
+                nota_media: parseFloat(local.nota_media).toFixed(1),
+                total_avaliacoes: parseInt(local.total_avaliacoes),
+                acessibilidade: itensDoLocal
+            };
+        });
+
+        res.json(locaisFormatados);
     } catch (erro) {
         console.error(erro);
-        res.status(500).send('Erro ao atualizar.');
+        res.status(500).send('Erro ao buscar locais.');
     }
 });
 
+// 3. Buscar a lista de itens de acessibilidade
+router.get('/itens', async (req, res) => {
+    try {
+        const itens = await pool.query('SELECT * FROM itens_acessibilidade ORDER BY id ASC');
+        res.json(itens.rows);
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).send('Erro ao buscar itens de acessibilidade.');
+    }
+});
+
+// 4. Excluir um local
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     try {
         await pool.query('DELETE FROM estabelecimentos WHERE id = $1', [id]);
-        res.status(200).send('Excluído com sucesso.');
+        res.status(200).send('Local excluído com sucesso.');
     } catch (erro) {
         console.error(erro);
-        res.status(500).send('Erro ao excluir.');
+        res.status(500).send('Erro ao excluir local.');
     }
 });
 
-// --- NOVAS ROTAS DE AVALIAÇÃO ---
+// 5. Atualizar um local
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nome, categoria, endereco, imagem_url } = req.body;
+    try {
+        const atualizado = await pool.query(
+            'UPDATE estabelecimentos SET nome = $1, categoria = $2, endereco = $3, imagem_url = $4 WHERE id = $5 RETURNING *',
+            [nome, categoria, endereco, imagem_url, id]
+        );
+        res.json(atualizado.rows[0]);
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).send('Erro ao atualizar local.');
+    }
+});
 
-// Busca as avaliações de um local específico junto com o nome de quem avaliou
+// 6. Buscar avaliações de um local
 router.get('/:id/avaliacoes', async (req, res) => {
     const { id } = req.params;
     try {
-        const query = `
-            SELECT a.*, u.nome as nome_usuario 
-            FROM avaliacoes a 
-            JOIN usuarios u ON a.usuario_id = u.id 
-            WHERE a.estabelecimento_id = $1 
-            ORDER BY a.data_criacao DESC
-        `;
-        const avaliacoes = await pool.query(query, [id]);
-        res.status(200).json(avaliacoes.rows);
+        const avaliacoes = await pool.query(
+            `SELECT a.*, u.nome as nome_usuario FROM avaliacoes a JOIN usuarios u ON a.usuario_id = u.id WHERE a.estabelecimento_id = $1 ORDER BY a.data_criacao DESC`, 
+            [id]
+        );
+        res.json(avaliacoes.rows);
     } catch (erro) {
         console.error(erro);
         res.status(500).send('Erro ao buscar avaliações.');
     }
 });
 
-// Salva uma nova avaliação
+// 7. Postar uma nova avaliação
 router.post('/:id/avaliacoes', async (req, res) => {
     const { id } = req.params;
     const { usuario_id, nota, comentario } = req.body;
     try {
-        const nova = await pool.query(
-            'INSERT INTO avaliacoes (estabelecimento_id, usuario_id, nota, comentario) VALUES ($1, $2, $3, $4) RETURNING *',
-            [id, usuario_id, nota, comentario]
+        const novaAvaliacao = await pool.query(
+            'INSERT INTO avaliacoes (nota, comentario, usuario_id, estabelecimento_id) VALUES ($1, $2, $3, $4) RETURNING *',
+            [nota, comentario, usuario_id, id]
         );
-        res.status(201).json(nova.rows[0]);
+        res.status(201).json(novaAvaliacao.rows[0]);
     } catch (erro) {
         console.error(erro);
-        res.status(500).send('Erro ao salvar avaliação.');
+        res.status(500).send('Erro ao enviar avaliação.');
+    }
+});
+
+// --- NOVAS ROTAS DE AVALIAÇÃO ---
+
+// 8. Excluir uma avaliação específica
+router.delete('/avaliacao/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await pool.query('DELETE FROM avaliacoes WHERE id = $1', [id]);
+        res.status(200).send('Avaliação excluída com sucesso.');
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).send('Erro ao excluir avaliação.');
+    }
+});
+
+// 9. Atualizar uma avaliação específica
+router.put('/avaliacao/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nota, comentario } = req.body;
+    try {
+        const atualizado = await pool.query(
+            'UPDATE avaliacoes SET nota = $1, comentario = $2 WHERE id = $3 RETURNING *',
+            [nota, comentario, id]
+        );
+        res.json(atualizado.rows[0]);
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).send('Erro ao atualizar avaliação.');
     }
 });
 
