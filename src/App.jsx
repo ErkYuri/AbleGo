@@ -3,7 +3,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import CadastroLocal from './pages/CadastroLocal';
 import Login from './pages/Login';
-import Perfil from './pages/Perfil'; // 1. Importamos a sala nova aqui!
+import Perfil from './pages/Perfil';
 
 function App() {
   return (
@@ -12,9 +12,10 @@ function App() {
       <main style={{ paddingTop: '4rem' }}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/cadastro" element={<CadastroLocal />} />
+          {/* Adicionamos o 'r' no final para combinar com o botão flutuante */}
+          <Route path="/cadastrar" element={<CadastroLocal />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/perfil" element={<Perfil />} /> {/* 2. Criamos o caminho para ela aqui! */}
+          <Route path="/perfil" element={<Perfil />} />
         </Routes>
       </main>
     </BrowserRouter>

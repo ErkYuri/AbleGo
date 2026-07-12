@@ -406,3 +406,58 @@
   box-shadow: 0 0 0 2px rgba(244, 123, 32, 0.1);
 }
 
+/* --- BOTÃO FLUTUANTE (FAB) --- */
+.floating-action-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: #f47b20;
+  color: #ffffff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.2rem;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 1rem;
+  box-shadow: 0 4px 16px rgba(244, 123, 32, 0.4);
+  z-index: 999; /* Garante que fique por cima de tudo */
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.floating-action-button:hover {
+  background-color: #e06915;
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 6px 20px rgba(244, 123, 32, 0.5);
+}
+
+.fab-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.fab-text {
+  font-size: 0.95rem;
+}
+
+/* RESPONSIVIDADE DO BOTÃO (Estilo puro Google Maps no Celular) */
+@media (max-width: 600px) {
+  .floating-action-button {
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border-radius: 50%; /* Vira uma bolinha perfeita no celular */
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+  
+  .fab-text {
+    display: none; /* Esconde o texto no celular para não amassar */
+  }
+  
+  .fab-icon {
+    font-size: 1.8rem; /* Aumenta o sinal de + no celular */
+  }
+}

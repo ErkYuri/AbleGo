@@ -44,10 +44,7 @@ function Navbar() {
           </span>
         )}
 
-        {/* MUDANÇA AQUI: Redireciona dinamicamente dependendo do login */}
-        <a href={usuarioLogado ? "/cadastro" : "/login"} className="btn-login" aria-label="Acessar formulário para cadastrar um novo local">
-          + Cadastrar Local
-        </a>
+        
       </div>
 
       {/* GRUPO DA DIREITA */}

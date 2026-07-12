@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import CardLocal from '../components/CardLocal';
 import ModalDetalhes from '../components/ModalDetalhes';
 import ModalEditar from '../components/ModalEditar';
@@ -150,7 +151,7 @@ function Home() {
           />
         </div>
 
-        {/* CARROSSEL DE CATEGORIAS COM AS NOVAS OPÇÕES */}
+        {/* CARROSSEL DE CATEGORIAS */}
         <div className="categories-carousel-wrapper">
           <button className="carousel-arrow" onClick={() => rolarCarrossel('esq')} aria-label="Rolar para esquerda">
             &#10094;
@@ -159,7 +160,7 @@ function Home() {
           <div className="filters-container" ref={carrosselRef} aria-label="Filtros de categoria">
             <button className={`filter-btn ${categoriaSelecionada === 'Todos' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Todos')}>📍 Todos</button>
             <button className={`filter-btn ${categoriaSelecionada === 'Restaurantes' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Restaurantes')}>🍽️ Restaurantes</button>
-            
+            <button className={`filter-btn ${categoriaSelecionada === 'Cafés' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Cafés')}>☕ Cafés</button>
             <button className={`filter-btn ${categoriaSelecionada === 'Supermercados' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Supermercados')}>🛒 Supermercados</button>
             <button className={`filter-btn ${categoriaSelecionada === 'Bancos' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Bancos')}>🏦 Bancos</button>
             <button className={`filter-btn ${categoriaSelecionada === 'Lazer' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Lazer')}>🎭 Lazer</button>
@@ -259,6 +260,13 @@ function Home() {
           fecharModal={() => setLocalEmEdicao(null)} 
           onSalvarSucesso={carregarDadosDoServidor} 
         />
+      )}
+
+      {usuarioLogado && (
+        <Link to="/cadastrar" className="floating-action-button" title="Cadastrar Novo Local">
+          <span className="fab-icon">+</span>
+          <span className="fab-text">Cadastrar Local</span>
+        </Link>
       )}
 
       <Footer />
