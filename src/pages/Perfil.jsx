@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import ModalEditar from '../components/ModalEditar'; // IMPORTA O MODAL DE EDIÇÃO DE LOCAIS
 import './Perfil.css';
 
@@ -338,6 +339,12 @@ function Perfil() {
           }} 
         />
       )}
+
+      {/* BOTÃO FLUTUANTE DE CADASTRO */}
+      <Link to="/cadastrar" className="floating-action-button" title="Cadastrar Novo Local">
+        <span className="fab-icon">+</span>
+        <span className="fab-text">Cadastrar Local</span>
+      </Link>
     </div>
   );
 }
