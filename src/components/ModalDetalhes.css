@@ -5,8 +5,8 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(15, 23, 42, 0.6); /* Cor cinza escura elegante */
-  backdrop-filter: blur(4px); /* Efeito blur de fundo */
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -20,7 +20,7 @@
   width: 100%;
   max-width: 650px;
   max-height: 90vh;
-  overflow-y: auto; /* Permite rolar o modal se for muito longo */
+  overflow-y: auto;
   position: relative;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   animation: modalScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -90,12 +90,16 @@
   padding: 2rem 1.5rem;
 }
 
+/* ALINHAMENTO CORRIGIDO DO CABEÇALHO E BOTÕES */
 .modal-local-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 1.5rem;
-  flex-wrap: wrap;
+}
+
+.modal-local-header > div:first-child {
+  flex: 1;
 }
 
 .modal-local-nome {
@@ -110,44 +114,33 @@
   margin: 0;
 }
 
-/* GRUPO DE BOTÕES DE AÇÃO */
+/* GRUPO DE BOTÕES DE AÇÃO PADRONIZADOS */
 .modal-local-acoes {
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  gap: 0.8rem;
+  flex-shrink: 0; 
+  justify-content: flex-end; 
 }
 
 .btn-acao-local {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.6rem 1rem;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid #cbd5e1;
+  background-color: #f8f9fa; 
+  color: #1a2b4c; 
 }
 
-.btn-acao-local.share {
-  background-color: #f1f5f9;
-  color: #334155;
-}
-
-.btn-acao-local.share:hover {
+.btn-acao-local:hover {
   background-color: #e2e8f0;
-}
-
-.btn-acao-local.maps {
-  background-color: #e0f2fe;
-  color: #0369a1;
-  border-color: #bae6fd;
-}
-
-.btn-acao-local.maps:hover {
-  background-color: #bae6fd;
-  color: #025a87;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .modal-divisor {
@@ -238,7 +231,6 @@
   line-height: 1.4;
 }
 
-/* NOVO: Imagem anexada na lista de avaliações */
 .modal-av-img-attachment {
   margin-top: 0.8rem;
   display: flex;

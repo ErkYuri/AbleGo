@@ -129,7 +129,7 @@ function ModalDetalhes({ local, fecharModal }) {
                 🔗 Compartilhar
               </button>
               <button className="btn-acao-local maps" onClick={handleComoChegar}>
-                🗺️ Rota no Maps
+                🗺️ Ver Rota
               </button>
             </div>
           </div>
