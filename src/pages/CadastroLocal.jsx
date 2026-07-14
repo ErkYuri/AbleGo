@@ -13,16 +13,19 @@ function CadastroLocal() {
   const [itensDisponiveis, setItensDisponiveis] = useState([]);
   const [carregando, setCarregando] = useState(false);
   const [mensagem, setMensagem] = useState({ tipo: '', texto: '' });
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
+  const [usuarioLogado] = useState(() => {
+    const usuarioSalvo = localStorage.getItem('usuario');
+    return usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
+  });
 
   useEffect(() => {
-    const usuarioSalvo = localStorage.getItem('usuario');
-    if (usuarioSalvo) {
-      setUsuarioLogado(JSON.parse(usuarioSalvo));
-    } else {
+    // Se o usuário não existir, manda para o login e para a execução
+    if (!usuarioLogado) {
       window.location.href = '/login';
+      return; 
     }
 
+    // Só carrega os itens se ele estiver logado
     const carregarItens = async () => {
       try {
         const resposta = await fetch('http://localhost:3000/api/locais/itens');
@@ -34,8 +37,9 @@ function CadastroLocal() {
         console.error('Erro ao buscar itens de acessibilidade:', error);
       }
     };
+    
     carregarItens();
-  }, []);
+  }, [usuarioLogado]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,6 +90,7 @@ function CadastroLocal() {
         setMensagem({ tipo: 'erro', texto: erroMsg || 'Erro ao cadastrar. Tente novamente.' });
       }
     } catch (error) {
+      console.error('Detalhes do erro de conexão:', error); // <-- Adicionamos o uso da ferramenta aqui!
       setMensagem({ tipo: 'erro', texto: 'Erro de conexão com o servidor.' });
     } finally {
       setCarregando(false);

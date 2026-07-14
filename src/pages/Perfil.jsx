@@ -4,12 +4,26 @@ import ModalEditar from '../components/ModalEditar';
 import './Perfil.css';
 
 function Perfil() {
-  const [usuario, setUsuario] = useState(null);
+  // O usuário já nasce lendo o localStorage
+  const [usuario, setUsuario] = useState(() => {
+    const usuarioSalvo = localStorage.getItem('usuario');
+    return usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
+  });
+
+  // O formData já nasce pegando as informações do usuário logado (se existir)
+  const [formData, setFormData] = useState(() => {
+    const usuarioSalvo = localStorage.getItem('usuario');
+    if (usuarioSalvo) {
+      const userObj = JSON.parse(usuarioSalvo);
+      return { nome: userObj.nome, email: userObj.email, pcd: userObj.pcd };
+    }
+    return { nome: '', email: '', pcd: false };
+  });
+
   const [dadosPerfil, setDadosPerfil] = useState({ locaisCadastrados: [], avaliacoesFeitas: [] });
   const [carregando, setCarregando] = useState(true);
 
   const [modoEdicao, setModoEdicao] = useState(false);
-  const [formData, setFormData] = useState({ nome: '', email: '', pcd: false });
   const [salvando, setSalvando] = useState(false);
 
   const [avaliacaoEmEdicao, setAvaliacaoEmEdicao] = useState(null);
@@ -33,17 +47,15 @@ function Perfil() {
     }
   };
 
+  // O useEffect agora só verifica se tem usuário ou chuta para o login
   useEffect(() => {
-    const usuarioSalvo = localStorage.getItem('usuario');
-    if (usuarioSalvo) {
-      const userObj = JSON.parse(usuarioSalvo);
-      setUsuario(userObj);
-      setFormData({ nome: userObj.nome, email: userObj.email, pcd: userObj.pcd });
-      carregarDadosDoPerfil(userObj.id);
+    if (usuario) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      carregarDadosDoPerfil(usuario.id);
     } else {
       window.location.href = '/login'; 
     }
-  }, []);
+  }, [usuario]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

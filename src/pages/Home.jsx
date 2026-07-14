@@ -13,7 +13,12 @@ function Home() {
   
   const [localSelecionado, setLocalSelecionado] = useState(null);
   const [localEmEdicao, setLocalEmEdicao] = useState(null);
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
+
+  // Inicializamos lendo a gaveta direto na criação da variável
+  const [usuarioLogado] = useState(() => {
+    const usuarioSalvo = localStorage.getItem('usuario');
+    return usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
+  });
   
   const [busca, setBusca] = useState('');
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Todos');
@@ -54,12 +59,11 @@ function Home() {
     }
   };
 
+  // O useEffect fica super limpo, apenas carregando os dados do servidor
   useEffect(() => {
-    const usuarioSalvo = localStorage.getItem('usuario');
-    if (usuarioSalvo) {
-      setUsuarioLogado(JSON.parse(usuarioSalvo));
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     carregarDadosDoServidor();
+    
     carregarItensAcessibilidade();
   }, []);
 

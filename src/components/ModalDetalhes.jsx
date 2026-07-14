@@ -1,10 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react'; // 1. Importamos o useCallback
 import './ModalDetalhes.css';
 
 function ModalDetalhes({ local, fecharModal }) {
   const [avaliacoes, setAvaliacoes] = useState([]);
   const [carregandoAvaliacoes, setCarregandoAvaliacoes] = useState(true);
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
+
+  // 2. CORREÇÃO 1: Inicialização inteligente do estado do utilizador (Lazy State)
+  // Como nunca mudamos o utilizador logado dentro deste modal, nem precisamos do "setUsuarioLogado"
+  const [usuarioLogado] = useState(() => {
+    const usuarioSalvo = localStorage.getItem('usuario');
+    return usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
+  });
 
   const [nota, setNota] = useState(5);
   const [comentario, setComentario] = useState('');
@@ -12,7 +18,8 @@ function ModalDetalhes({ local, fecharModal }) {
   const [enviando, setEnviando] = useState(false);
   const [sucesso, setSucesso] = useState('');
 
-  const carregarAvaliacoes = async () => {
+  // 3. CORREÇÃO 2: Envolvemos a função em useCallback para o React saber quando ela muda
+  const carregarAvaliacoes = useCallback(async () => {
     try {
       const resposta = await fetch(`http://localhost:3000/api/locais/${local.id}/avaliacoes`);
       if (resposta.ok) {
@@ -24,22 +31,19 @@ function ModalDetalhes({ local, fecharModal }) {
     } finally {
       setCarregandoAvaliacoes(false);
     }
-  };
+  }, [local.id]); // Só recria a função se o ID do local mudar
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-
-    const usuarioSalvo = localStorage.getItem('usuario');
-    if (usuarioSalvo) {
-      setUsuarioLogado(JSON.parse(usuarioSalvo));
-    }
-
+    
+    // Chamamos a função memorizada
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     carregarAvaliacoes();
 
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [local.id]);
+  }, [carregarAvaliacoes]); // Agora carregarAvaliacoes é uma dependência segura e o ESLint não reclama!
 
   const handleCompartilhar = () => {
     const link = window.location.href;
@@ -95,7 +99,6 @@ function ModalDetalhes({ local, fecharModal }) {
 
   return (
     <div className="modal-detalhes-overlay" onClick={fecharModal}>
-      {/* ATRIBUTOS ARIA ADICIONADOS AO MODAL */}
       <div 
         className="modal-detalhes-content" 
         role="dialog" 
@@ -120,7 +123,6 @@ function ModalDetalhes({ local, fecharModal }) {
         <div className="modal-detalhes-body">
           <div className="modal-local-header">
             <div>
-              {/* O id abaixo conecta este título ao leitor de tela do Modal */}
               <h2 id="modal-title-id" className="modal-local-nome">{local.nome}</h2>
               <p className="modal-local-endereco">
                 <span aria-hidden="true">📍</span> {local.endereco}
@@ -171,7 +173,6 @@ function ModalDetalhes({ local, fecharModal }) {
                   <div key={av.id} className="modal-avaliacao-card">
                     <div className="modal-av-header">
                       <strong>{av.nome_usuario}</strong>
-                      {/* O leitor lê apenas o aria-label abaixo, ignorando os caracteres visuais das estrelas */}
                       <span className="modal-av-stars" aria-label={`Nota: ${av.nota} de 5 estrelas`}>
                         <span aria-hidden="true">
                           {"★".repeat(av.nota)}{"☆".repeat(5 - av.nota)}
