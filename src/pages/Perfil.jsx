@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import ModalEditar from '../components/ModalEditar'; // IMPORTA O MODAL DE EDIÇÃO DE LOCAIS
+import ModalEditar from '../components/ModalEditar';
 import './Perfil.css';
 
 function Perfil() {
@@ -13,10 +13,11 @@ function Perfil() {
   const [formData, setFormData] = useState({ nome: '', email: '', pcd: false });
   const [salvando, setSalvando] = useState(false);
 
-  // Estados para edição de avaliação
+  // Estados para edição de avaliação (Adicionado editImagemUrl)
   const [avaliacaoEmEdicao, setAvaliacaoEmEdicao] = useState(null);
   const [editNota, setEditNota] = useState(5);
   const [editComentario, setEditComentario] = useState('');
+  const [editImagemUrl, setEditImagemUrl] = useState('');
 
   // Estados para edição de local
   const [localEmEdicao, setLocalEmEdicao] = useState(null);
@@ -125,6 +126,7 @@ function Perfil() {
     setAvaliacaoEmEdicao(av);
     setEditNota(av.nota);
     setEditComentario(av.comentario || '');
+    setEditImagemUrl(av.imagem_url || ''); // Carrega a imagem antiga se existir
   };
 
   const fecharEdicaoAvaliacao = () => {
@@ -138,7 +140,7 @@ function Perfil() {
       const resposta = await fetch(`http://localhost:3000/api/locais/avaliacao/${avaliacaoEmEdicao.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nota: editNota, comentario: editComentario })
+        body: JSON.stringify({ nota: editNota, comentario: editComentario, imagem_url: editImagemUrl })
       });
 
       if (resposta.ok) {
@@ -146,7 +148,7 @@ function Perfil() {
           ...prev,
           avaliacoesFeitas: prev.avaliacoesFeitas.map(av => 
             av.id === avaliacaoEmEdicao.id 
-              ? { ...av, nota: editNota, comentario: editComentario } 
+              ? { ...av, nota: editNota, comentario: editComentario, imagem_url: editImagemUrl } 
               : av
           )
         }));
@@ -233,13 +235,11 @@ function Perfil() {
                 <div key={local.id} className="perfil-list-item review-item">
                   
                   <div className="review-top-row">
-                    {/* NOME E TAG NA ESQUERDA */}
                     <div className="local-header-left">
                       <strong>{local.nome}</strong>
                       <span className="perfil-item-categoria">{local.categoria}</span>
                     </div>
                     
-                    {/* BOTÕES ISOLADOS NA DIREITA */}
                     <div className="review-item-actions">
                       <button className="btn-action-review edit" onClick={() => setLocalEmEdicao(local)} title="Editar Local">✏️</button>
                       <button className="btn-action-review delete" onClick={() => handleExcluirLocal(local.id, local.nome)} title="Excluir Local">🗑️</button>
@@ -279,6 +279,18 @@ function Perfil() {
                   
                   {av.comentario && <p className="review-comentario">"{av.comentario}"</p>}
 
+                  {/* NOVO: Exibe a imagem anexada à avaliação */}
+                  {av.imagem_url && (
+                    <div className="review-image-attachment">
+                      <img 
+                        src={av.imagem_url} 
+                        alt="Evidência anexada" 
+                        onClick={() => window.open(av.imagem_url, '_blank')} 
+                        title="Clique para abrir em tamanho real"
+                      />
+                    </div>
+                  )}
+
                 </div>
               ))}
             </div>
@@ -316,6 +328,26 @@ function Perfil() {
                 rows="4"
                 placeholder="Atualize seu comentário..."
               ></textarea>
+
+              {/* NOVO: Input para editar URL da imagem na avaliação */}
+              <div className="form-group" style={{ marginTop: '1rem', textAlign: 'left' }}>
+                <label style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#334155' }}>Link da Imagem (Opcional)</label>
+                <input 
+                  type="url" 
+                  value={editImagemUrl} 
+                  onChange={(e) => setEditImagemUrl(e.target.value)}
+                  placeholder="https://exemplo.com/imagem-rampa.jpg"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '8px',
+                    fontSize: '0.95rem',
+                    marginTop: '0.3rem',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
               
               <div className="modal-editar-acoes">
                 <button type="button" className="btn-cancelar" onClick={fecharEdicaoAvaliacao}>Cancelar</button>

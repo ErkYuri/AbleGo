@@ -1,295 +1,396 @@
-/* Fundo escuro com desfoque */
-.modal-overlay {
+/* --- OVERLAY E CONTENT DO MODAL --- */
+.modal-detalhes-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(15, 23, 42, 0.7); 
+  background-color: rgba(15, 23, 42, 0.6); /* Cor cinza escura elegante */
+  backdrop-filter: blur(4px); /* Efeito blur de fundo */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100; /* Garante que fique por cima da Navbar */
+  z-index: 1000;
   padding: 1rem;
 }
 
-/* O cartão branco da janela */
-.modal-content {
+.modal-detalhes-content {
   background-color: #ffffff;
-  border-radius: 12px;
+  border-radius: 16px;
   width: 100%;
-  max-width: 500px;
-  max-height: 90vh; /* Se o conteúdo for muito grande, ele não passa da tela */
-  overflow-y: auto; /* Cria barra de rolagem interna se precisar */
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto; /* Permite rolar o modal se for muito longo */
   position: relative;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: modalScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Botão de X para fechar */
-.modal-close-btn {
+@keyframes modalScaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* --- BOTÃO DE FECHAR NO TOPO --- */
+.btn-modal-fechar {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.9);
   color: #1e293b;
   border: none;
-  width: 2.2rem;
-  height: 2.2rem;
+  font-size: 2rem;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  font-size: 1.5rem;
-  cursor: pointer;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  cursor: pointer;
   z-index: 10;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
 }
 
-.modal-close-btn:hover {
-  background-color: #fef2f2; /* Vermelho super claro */
-  color: #b91c1c;
+.btn-modal-fechar:hover {
+  background-color: #ffffff;
+  color: #f47b20;
   transform: scale(1.05);
 }
 
-/* Imagem de Capa do Modal */
-.modal-img-container {
+/* --- BANNER DE IMAGEM --- */
+.modal-detalhes-banner {
   position: relative;
   width: 100%;
-  height: 220px;
+  height: 240px;
 }
 
-.modal-img {
+.modal-banner-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.modal-categoria {
+.modal-tag-categoria {
   position: absolute;
-  bottom: -15px;
+  bottom: 1rem;
   left: 1.5rem;
-  background-color: #f47b20; /* Laranja padrão */
+  background-color: #f47b20;
   color: #ffffff;
   padding: 0.4rem 1rem;
-  border-radius: 9999px;
-  font-size: 0.8rem;
+  border-radius: 50px;
   font-weight: bold;
-  text-transform: uppercase;
-  border: 3px solid #ffffff;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(244, 123, 32, 0.3);
 }
 
-/* Corpo do Texto */
-.modal-body {
-  padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+/* --- CORPO E SEÇÕES --- */
+.modal-detalhes-body {
+  padding: 2rem 1.5rem;
 }
 
-.modal-nome {
-  font-size: 1.6rem;
-  color: #1e293b;
-  margin-bottom: 0.25rem;
+.modal-local-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
-.modal-endereco {
+.modal-local-nome {
+  color: #1a2b4c;
+  font-size: 1.8rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.modal-local-endereco {
   color: #64748b;
   font-size: 0.95rem;
-  margin-bottom: 2rem;
+  margin: 0;
 }
 
-.modal-section-title {
-  font-size: 0.9rem;
-  color: #1e293b;
-  margin-bottom: 1rem;
-  border-bottom: 2px solid #e2e8f0;
-  padding-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Lista de Acessibilidade */
-.modal-checklist {
-  list-style: none;
-  padding: 0;
+/* GRUPO DE BOTÕES DE AÇÃO */
+.modal-local-acoes {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.modal-check-item {
-  background-color: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #166534;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  display: flex;
+.btn-acao-local {
+  display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid #cbd5e1;
 }
 
-.modal-empty-msg {
-  color: #94a3b8;
+.btn-acao-local.share {
+  background-color: #f1f5f9;
+  color: #334155;
+}
+
+.btn-acao-local.share:hover {
+  background-color: #e2e8f0;
+}
+
+.btn-acao-local.maps {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+
+.btn-acao-local.maps:hover {
+  background-color: #bae6fd;
+  color: #025a87;
+}
+
+.modal-divisor {
+  border: 0;
+  height: 1px;
+  background-color: #cbd5e1;
+  margin: 1.5rem 0;
+}
+
+.modal-secao-title {
+  color: #1a2b4c;
+  font-size: 1.15rem;
+  margin: 0 0 1rem 0;
+}
+
+.modal-empty-text {
+  color: #64748b;
   font-style: italic;
-  text-align: center;
-  padding: 1rem;
+  font-size: 0.95rem;
+  margin: 0;
 }
 
-/* --- Estilos da Nova Seção de Reviews --- */
-.modal-checklist-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+/* --- RECURSOS DE ACESSIBILIDADE --- */
+.modal-recursos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.modal-recurso-tag {
+  background-color: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
   gap: 0.5rem;
 }
 
-.reviews-section {
-  margin-top: 2rem;
+.recurso-icone {
+  font-size: 1.1rem;
 }
 
-.review-form {
-  background-color: #f8f9fa;
-  padding: 1.25rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  border: 1px solid #e2e8f0;
-}
-
-.stars-selector {
-  margin-bottom: 0.75rem;
-  font-weight: 600;
-  color: #334155;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.star-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: #cbd5e1; /* Estrela cinza (apagada) */
-  cursor: pointer;
-  transition: color 0.2s ease;
-  padding: 0;
-}
-
-.star-btn.active {
-  color: #fbbf24; /* Estrela amarela (acesa) */
-}
-
-.review-textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
-  resize: vertical;
-  font-family: inherit;
-  margin-bottom: 0.75rem;
-  box-sizing: border-box;
-}
-
-.review-textarea:focus {
-  outline: none;
-  border-color: #f47b20;
-}
-
-.btn-enviar-review {
-  background-color: #1a2b4c;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.btn-enviar-review:disabled {
-  background-color: #94a3b8;
-  cursor: not-allowed;
-}
-
-.login-prompt {
-  background-color: #f0fdf4;
-  padding: 1rem;
-  border-radius: 8px;
+/* --- AVALIAÇÕES DA COMUNIDADE --- */
+.modal-loading {
+  color: #64748b;
+  font-style: italic;
   text-align: center;
-  margin-bottom: 1.5rem;
-  border: 1px solid #bbf7d0;
-  color: #166534;
 }
 
-.login-prompt a {
-  color: #f47b20;
-  font-weight: bold;
-}
-
-.reviews-list {
+.modal-avaliacoes-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.review-card {
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 1rem;
+.modal-avaliacao-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem;
 }
 
-.review-header {
+.modal-av-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 0.5rem;
 }
 
-.review-author {
-  font-weight: bold;
+.modal-av-header strong {
   color: #1e293b;
+  font-size: 0.95rem;
 }
 
-.review-stars {
-  color: #fbbf24;
-  letter-spacing: 0.1em;
+.modal-av-stars {
+  color: #f59e0b;
+  font-size: 1rem;
 }
 
-.review-text {
+.modal-av-comentario {
+  margin: 0;
   color: #475569;
   font-size: 0.95rem;
   line-height: 1.4;
-  margin: 0;
 }
 
-/* --- Estilos do Botão Compartilhar --- */
-.modal-header-flex {
+/* NOVO: Imagem anexada na lista de avaliações */
+.modal-av-img-attachment {
+  margin-top: 0.8rem;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
 }
 
-.modal-header-flex .modal-nome {
-  margin-bottom: 0.2rem;
+.modal-av-img-attachment img {
+  max-width: 140px;
+  max-height: 90px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  object-fit: cover;
+  transition: transform 0.2s ease;
 }
 
-.btn-compartilhar {
+.modal-av-img-attachment img:hover {
+  transform: scale(1.05);
+}
+
+/* --- FORMULÁRIO DE NOVA AVALIAÇÃO --- */
+.form-avaliacao-secao {
+  background-color: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.modal-av-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-av-nota-select {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  background-color: #f1f5f9;
-  color: #1a2b4c;
-  border: 1px solid #cbd5e1;
-  padding: 0.5rem 0.8rem;
-  border-radius: 8px;
+  gap: 1rem;
   font-weight: 600;
-  font-size: 0.85rem;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.stars-selector-container {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.star-select-btn {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  color: #cbd5e1;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.1s;
+  padding: 0;
 }
 
-.btn-compartilhar:hover {
-  background-color: #e2e8f0;
-  border-color: #94a3b8;
+.star-select-btn.active {
+  color: #f59e0b;
 }
 
-.btn-compartilhar svg {
-  color: #f47b20;
+.modal-av-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.modal-av-form .form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.modal-av-form textarea,
+.modal-av-form input {
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background-color: #ffffff;
+}
+
+.modal-av-form textarea:focus,
+.modal-av-form input:focus {
+  outline: none;
+  border-color: #f47b20;
+  box-shadow: 0 0 0 3px rgba(244, 123, 32, 0.1);
+}
+
+.btn-enviar-av {
+  background-color: #f47b20;
+  color: #ffffff;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 0.5rem;
+}
+
+.btn-enviar-av:hover:not(:disabled) {
+  background-color: #e06915;
+}
+
+.btn-enviar-av:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.alerta-sucesso-av {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 0.8rem;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* --- BANNER DE LOGIN PARA AVALIAR --- */
+.modal-av-login-banner {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.modal-av-login-banner p {
+  color: #1e3a8a;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.btn-av-login {
+  display: inline-block;
+  background-color: #2563eb;
+  color: #ffffff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.btn-av-login:hover {
+  background-color: #1d4ed8;
 }

@@ -89,12 +89,16 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// 6. Buscar avaliações de um local
+// 6. Buscar avaliações de um local (Trazendo o campo imagem_url da avaliação)
 router.get('/:id/avaliacoes', async (req, res) => {
     const { id } = req.params;
     try {
         const avaliacoes = await pool.query(
-            `SELECT a.*, u.nome as nome_usuario FROM avaliacoes a JOIN usuarios u ON a.usuario_id = u.id WHERE a.estabelecimento_id = $1 ORDER BY a.data_criacao DESC`, 
+            `SELECT a.*, u.nome as nome_usuario 
+             FROM avaliacoes a 
+             JOIN usuarios u ON a.usuario_id = u.id 
+             WHERE a.estabelecimento_id = $1 
+             ORDER BY a.data_criacao DESC`, 
             [id]
         );
         res.json(avaliacoes.rows);
@@ -104,14 +108,14 @@ router.get('/:id/avaliacoes', async (req, res) => {
     }
 });
 
-// 7. Postar uma nova avaliação
+// 7. Postar uma nova avaliação (Salvando a imagem_url)
 router.post('/:id/avaliacoes', async (req, res) => {
     const { id } = req.params;
-    const { usuario_id, nota, comentario } = req.body;
+    const { usuario_id, nota, comentario, imagem_url } = req.body;
     try {
         const novaAvaliacao = await pool.query(
-            'INSERT INTO avaliacoes (nota, comentario, usuario_id, estabelecimento_id) VALUES ($1, $2, $3, $4) RETURNING *',
-            [nota, comentario, usuario_id, id]
+            'INSERT INTO avaliacoes (nota, comentario, usuario_id, estabelecimento_id, imagem_url) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [nota, comentario, usuario_id, id, imagem_url]
         );
         res.status(201).json(novaAvaliacao.rows[0]);
     } catch (erro) {
@@ -119,8 +123,6 @@ router.post('/:id/avaliacoes', async (req, res) => {
         res.status(500).send('Erro ao enviar avaliação.');
     }
 });
-
-// --- NOVAS ROTAS DE AVALIAÇÃO ---
 
 // 8. Excluir uma avaliação específica
 router.delete('/avaliacao/:id', async (req, res) => {
@@ -134,14 +136,14 @@ router.delete('/avaliacao/:id', async (req, res) => {
     }
 });
 
-// 9. Atualizar uma avaliação específica
+// 9. Atualizar uma avaliação específica (Atualizando a imagem_url)
 router.put('/avaliacao/:id', async (req, res) => {
     const { id } = req.params;
-    const { nota, comentario } = req.body;
+    const { nota, comentario, imagem_url } = req.body;
     try {
         const atualizado = await pool.query(
-            'UPDATE avaliacoes SET nota = $1, comentario = $2 WHERE id = $3 RETURNING *',
-            [nota, comentario, id]
+            'UPDATE avaliacoes SET nota = $1, comentario = $2, imagem_url = $3 WHERE id = $4 RETURNING *',
+            [nota, comentario, imagem_url, id]
         );
         res.json(atualizado.rows[0]);
     } catch (erro) {
