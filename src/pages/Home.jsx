@@ -160,7 +160,7 @@ function Home() {
           <div className="filters-container" ref={carrosselRef} aria-label="Filtros de categoria">
             <button className={`filter-btn ${categoriaSelecionada === 'Todos' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Todos')}>📍 Todos</button>
             <button className={`filter-btn ${categoriaSelecionada === 'Restaurantes' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Restaurantes')}>🍽️ Restaurantes</button>
-            <button className={`filter-btn ${categoriaSelecionada === 'Cafés' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Cafés')}>☕ Cafés</button>
+            <button className={`filter-btn ${categoriaSelecionada === 'Farmácias' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Farmácias')}>💊 Farmácias</button>
             <button className={`filter-btn ${categoriaSelecionada === 'Supermercados' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Supermercados')}>🛒 Supermercados</button>
             <button className={`filter-btn ${categoriaSelecionada === 'Bancos' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Bancos')}>🏦 Bancos</button>
             <button className={`filter-btn ${categoriaSelecionada === 'Lazer' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Lazer')}>🎭 Lazer</button>

@@ -118,6 +118,7 @@ function CadastroLocal() {
             <select id="categoria" name="categoria" value={formData.categoria} onChange={handleChange} required>
               <option value="">Selecione uma categoria...</option>
               <option value="Restaurantes">Restaurantes</option>
+              <option value="Farmácias">Farmácias</option>
               <option value="Supermercados">Supermercados</option>
               <option value="Bancos">Bancos</option>
               <option value="Lazer">Lazer</option>
