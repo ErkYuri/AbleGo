@@ -8,18 +8,15 @@ function Perfil() {
   const [dadosPerfil, setDadosPerfil] = useState({ locaisCadastrados: [], avaliacoesFeitas: [] });
   const [carregando, setCarregando] = useState(true);
 
-  // Estados para edição do perfil
   const [modoEdicao, setModoEdicao] = useState(false);
   const [formData, setFormData] = useState({ nome: '', email: '', pcd: false });
   const [salvando, setSalvando] = useState(false);
 
-  // Estados para edição de avaliação (Adicionado editImagemUrl)
   const [avaliacaoEmEdicao, setAvaliacaoEmEdicao] = useState(null);
   const [editNota, setEditNota] = useState(5);
   const [editComentario, setEditComentario] = useState('');
   const [editImagemUrl, setEditImagemUrl] = useState('');
 
-  // Estados para edição de local
   const [localEmEdicao, setLocalEmEdicao] = useState(null);
 
   const carregarDadosDoPerfil = async (idUsuario) => {
@@ -80,8 +77,6 @@ function Perfil() {
     }
   };
 
-  // --- FUNÇÕES DE LOCAIS ---
-
   const handleExcluirLocal = async (id, nome) => {
     if (window.confirm(`Tem certeza que deseja excluir permanentemente o local "${nome}"?`)) {
       try {
@@ -100,8 +95,6 @@ function Perfil() {
       }
     }
   };
-
-  // --- FUNÇÕES DE AVALIAÇÃO ---
 
   const handleExcluirAvaliacao = async (id) => {
     if (window.confirm('Tem certeza que deseja excluir esta avaliação?')) {
@@ -126,7 +119,7 @@ function Perfil() {
     setAvaliacaoEmEdicao(av);
     setEditNota(av.nota);
     setEditComentario(av.comentario || '');
-    setEditImagemUrl(av.imagem_url || ''); // Carrega a imagem antiga se existir
+    setEditImagemUrl(av.imagem_url || ''); 
   };
 
   const fecharEdicaoAvaliacao = () => {
@@ -164,7 +157,7 @@ function Perfil() {
     }
   };
 
-  if (carregando) return <p className="perfil-loading">Carregando seu histórico no AbleGo...</p>;
+  if (carregando) return <p className="perfil-loading" aria-live="polite">Carregando seu histórico no AbleGo...</p>;
   if (!usuario) return null;
 
   return (
@@ -175,13 +168,13 @@ function Perfil() {
           <h2 className="perfil-page-title">Meu Perfil</h2>
           {!modoEdicao && (
             <button className="btn-editar-perfil" onClick={() => setModoEdicao(true)}>
-              ✏️ Editar Perfil
+              <span aria-hidden="true">✏️</span> Editar Perfil
             </button>
           )}
         </div>
 
         {modoEdicao ? (
-          <form onSubmit={handleSalvarPerfil} className="perfil-form">
+          <form onSubmit={handleSalvarPerfil} className="perfil-form" aria-label="Formulário de edição de perfil">
             <div className="form-group">
               <label htmlFor="nome">Nome Completo</label>
               <input type="text" id="nome" name="nome" value={formData.nome} onChange={handleChange} required />
@@ -209,19 +202,19 @@ function Perfil() {
             </div>
           </form>
         ) : (
-          <div className="perfil-header">
-            <div className="perfil-avatar">
+          <div className="perfil-header" aria-label="Informações de perfil">
+            <div className="perfil-avatar" aria-hidden="true">
               {usuario.nome.charAt(0).toUpperCase()}
             </div>
             <div>
               <h2 className="perfil-nome">{usuario.nome}</h2>
               <p className="perfil-email">{usuario.email}</p>
-              {usuario.pcd && <span className="tag-pcd">♿ Usuário PcD</span>}
+              {usuario.pcd && <span className="tag-pcd"><span aria-hidden="true">♿</span> Usuário PcD</span>}
             </div>
           </div>
         )}
 
-        <hr className="perfil-divisor" />
+        <hr className="perfil-divisor" aria-hidden="true" />
 
         <section className="perfil-section">
           <h3 className="perfil-section-title">
@@ -230,7 +223,7 @@ function Perfil() {
           {dadosPerfil.locaisCadastrados.length === 0 ? (
             <p className="perfil-empty-msg">Você ainda não contribuiu com nenhum local no mapa.</p>
           ) : (
-            <div className="perfil-list">
+            <div className="perfil-list" aria-label="Lista de locais que você cadastrou">
               {dadosPerfil.locaisCadastrados.map(local => (
                 <div key={local.id} className="perfil-list-item review-item">
                   
@@ -241,8 +234,20 @@ function Perfil() {
                     </div>
                     
                     <div className="review-item-actions">
-                      <button className="btn-action-review edit" onClick={() => setLocalEmEdicao(local)} title="Editar Local">✏️</button>
-                      <button className="btn-action-review delete" onClick={() => handleExcluirLocal(local.id, local.nome)} title="Excluir Local">🗑️</button>
+                      <button 
+                        className="btn-action-review edit" 
+                        onClick={() => setLocalEmEdicao(local)} 
+                        aria-label={`Editar dados de ${local.nome}`}
+                      >
+                        <span aria-hidden="true">✏️</span>
+                      </button>
+                      <button 
+                        className="btn-action-review delete" 
+                        onClick={() => handleExcluirLocal(local.id, local.nome)} 
+                        aria-label={`Excluir local ${local.nome}`}
+                      >
+                        <span aria-hidden="true">🗑️</span>
+                      </button>
                     </div>
                   </div>
 
@@ -259,32 +264,45 @@ function Perfil() {
           {dadosPerfil.avaliacoesFeitas.length === 0 ? (
             <p className="perfil-empty-msg">Você ainda não avaliou nenhum estabelecimento.</p>
           ) : (
-            <div className="perfil-list">
+            <div className="perfil-list" aria-label="Lista de avaliações feitas por você">
               {dadosPerfil.avaliacoesFeitas.map(av => (
                 <div key={av.id} className="perfil-list-item review-item">
                   
                   <div className="review-top-row">
                     <div className="review-header-left">
                       <strong>{av.nome_local}</strong>
-                      <span className="review-stars">
-                        {"★".repeat(av.nota)}{"☆".repeat(5 - av.nota)}
+                      <span className="review-stars" aria-label={`Nota: ${av.nota} de 5 estrelas`}>
+                        <span aria-hidden="true">
+                          {"★".repeat(av.nota)}{"☆".repeat(5 - av.nota)}
+                        </span>
                       </span>
                     </div>
                     
                     <div className="review-item-actions">
-                      <button className="btn-action-review edit" onClick={() => abrirEdicaoAvaliacao(av)} title="Editar Avaliação">✏️</button>
-                      <button className="btn-action-review delete" onClick={() => handleExcluirAvaliacao(av.id)} title="Excluir Avaliação">🗑️</button>
+                      <button 
+                        className="btn-action-review edit" 
+                        onClick={() => abrirEdicaoAvaliacao(av)} 
+                        aria-label={`Editar sua avaliação de ${av.nome_local}`}
+                      >
+                        <span aria-hidden="true">✏️</span>
+                      </button>
+                      <button 
+                        className="btn-action-review delete" 
+                        onClick={() => handleExcluirAvaliacao(av.id)} 
+                        aria-label={`Excluir sua avaliação de ${av.nome_local}`}
+                      >
+                        <span aria-hidden="true">🗑️</span>
+                      </button>
                     </div>
                   </div>
                   
                   {av.comentario && <p className="review-comentario">"{av.comentario}"</p>}
 
-                  {/* NOVO: Exibe a imagem anexada à avaliação */}
                   {av.imagem_url && (
                     <div className="review-image-attachment">
                       <img 
                         src={av.imagem_url} 
-                        alt="Evidência anexada" 
+                        alt={`Evidência anexada à avaliação de ${av.nome_local}`} 
                         onClick={() => window.open(av.imagem_url, '_blank')} 
                         title="Clique para abrir em tamanho real"
                       />
@@ -299,26 +317,35 @@ function Perfil() {
 
       </main>
 
-      {/* MODAL DE EDIÇÃO DE AVALIAÇÃO */}
       {avaliacaoEmEdicao && (
         <div className="modal-overlay" onClick={fecharEdicaoAvaliacao}>
-          <div className="modal-content-small" onClick={(e) => e.stopPropagation()}>
-            <h3 className="modal-title">Editar Avaliação</h3>
+          <div 
+            className="modal-content-small" 
+            role="dialog" 
+            aria-modal="true" 
+            aria-labelledby="title-edit-av"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="title-edit-av" className="modal-title">Editar Avaliação</h3>
             <p className="modal-subtitle">Local: {avaliacaoEmEdicao.nome_local}</p>
             
             <form onSubmit={handleSalvarEdicaoAvaliacao} className="review-form">
               <div className="stars-selector-edit">
-                <span>Nova Nota: </span>
-                {[1, 2, 3, 4, 5].map(num => (
-                  <button 
-                    key={num} 
-                    type="button" 
-                    className={`star-btn ${editNota >= num ? 'active' : ''}`}
-                    onClick={() => setEditNota(num)}
-                  >
-                    ★
-                  </button>
-                ))}
+                <span id="edit-stars-label">Nova Nota: </span>
+                <div role="radiogroup" aria-labelledby="edit-stars-label" style={{ display: 'inline-flex', gap: '0.2rem' }}>
+                  {[1, 2, 3, 4, 5].map(num => (
+                    <button 
+                      key={num} 
+                      type="button" 
+                      className={`star-btn ${editNota >= num ? 'active' : ''}`}
+                      onClick={() => setEditNota(num)}
+                      aria-label={`Mudar para ${num} estrelas`}
+                      aria-pressed={editNota >= num}
+                    >
+                      <span aria-hidden="true">★</span>
+                    </button>
+                  ))}
+                </div>
               </div>
               
               <textarea 
@@ -327,13 +354,14 @@ function Perfil() {
                 className="review-textarea"
                 rows="4"
                 placeholder="Atualize seu comentário..."
+                aria-label="Comentário da avaliação"
               ></textarea>
 
-              {/* NOVO: Input para editar URL da imagem na avaliação */}
               <div className="form-group" style={{ marginTop: '1rem', textAlign: 'left' }}>
-                <label style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#334155' }}>Link da Imagem (Opcional)</label>
+                <label htmlFor="edit_imagem_url" style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#334155' }}>Link da Imagem (Opcional)</label>
                 <input 
                   type="url" 
+                  id="edit_imagem_url"
                   value={editImagemUrl} 
                   onChange={(e) => setEditImagemUrl(e.target.value)}
                   placeholder="https://exemplo.com/imagem-rampa.jpg"
@@ -360,7 +388,6 @@ function Perfil() {
         </div>
       )}
 
-      {/* MODAL DE EDIÇÃO DE LOCAL */}
       {localEmEdicao && (
         <ModalEditar 
           local={localEmEdicao} 
@@ -372,9 +399,9 @@ function Perfil() {
         />
       )}
 
-      {/* BOTÃO FLUTUANTE DE CADASTRO */}
-      <Link to="/cadastrar" className="floating-action-button" title="Cadastrar Novo Local">
-        <span className="fab-icon">+</span>
+      {/* BOTÃO FLUTUANTE DE CADASTRO ACCESSIBLE */}
+      <Link to="/cadastrar" className="floating-action-button" aria-label="Cadastrar Novo Local">
+        <span className="fab-icon" aria-hidden="true">+</span>
         <span className="fab-text">Cadastrar Local</span>
       </Link>
     </div>

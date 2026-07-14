@@ -151,24 +151,38 @@ function Home() {
           />
         </div>
 
-        {/* CARROSSEL DE CATEGORIAS */}
+        {/* CARROSSEL DE CATEGORIAS ACCESSIBLE */}
         <div className="categories-carousel-wrapper">
-          <button className="carousel-arrow" onClick={() => rolarCarrossel('esq')} aria-label="Rolar para esquerda">
-            &#10094;
+          <button className="carousel-arrow" onClick={() => rolarCarrossel('esq')} aria-label="Rolar categorias para esquerda">
+            <span aria-hidden="true">&#10094;</span>
           </button>
           
           <div className="filters-container" ref={carrosselRef} aria-label="Filtros de categoria">
-            <button className={`filter-btn ${categoriaSelecionada === 'Todos' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Todos')}>📍 Todos</button>
-            <button className={`filter-btn ${categoriaSelecionada === 'Restaurantes' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Restaurantes')}>🍽️ Restaurantes</button>
-            <button className={`filter-btn ${categoriaSelecionada === 'Farmácias' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Farmácias')}>💊 Farmácias</button>
-            <button className={`filter-btn ${categoriaSelecionada === 'Supermercados' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Supermercados')}>🛒 Supermercados</button>
-            <button className={`filter-btn ${categoriaSelecionada === 'Bancos' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Bancos')}>🏦 Bancos</button>
-            <button className={`filter-btn ${categoriaSelecionada === 'Lazer' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Lazer')}>🎭 Lazer</button>
-            <button className={`filter-btn ${categoriaSelecionada === 'Hospital' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Hospital')}>🏥 Hospital</button>
+            <button className={`filter-btn ${categoriaSelecionada === 'Todos' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Todos')}>
+              <span aria-hidden="true">📍</span> Todos
+            </button>
+            <button className={`filter-btn ${categoriaSelecionada === 'Restaurantes' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Restaurantes')}>
+              <span aria-hidden="true">🍽️</span> Restaurantes
+            </button>
+            <button className={`filter-btn ${categoriaSelecionada === 'Farmácias' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Farmácias')}>
+              <span aria-hidden="true">💊</span> Farmácias
+            </button>
+            <button className={`filter-btn ${categoriaSelecionada === 'Supermercados' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Supermercados')}>
+              <span aria-hidden="true">🛒</span> Supermercados
+            </button>
+            <button className={`filter-btn ${categoriaSelecionada === 'Bancos' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Bancos')}>
+              <span aria-hidden="true">🏦</span> Bancos
+            </button>
+            <button className={`filter-btn ${categoriaSelecionada === 'Lazer' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Lazer')}>
+              <span aria-hidden="true">🎭</span> Lazer
+            </button>
+            <button className={`filter-btn ${categoriaSelecionada === 'Hospital' ? 'active' : ''}`} onClick={() => setCategoriaSelecionada('Hospital')}>
+              <span aria-hidden="true">🏥</span> Hospital
+            </button>
           </div>
 
-          <button className="carousel-arrow" onClick={() => rolarCarrossel('dir')} aria-label="Rolar para direita">
-            &#10095;
+          <button className="carousel-arrow" onClick={() => rolarCarrossel('dir')} aria-label="Rolar categorias para direita">
+            <span aria-hidden="true">&#10095;</span>
           </button>
         </div>
 
@@ -176,12 +190,13 @@ function Home() {
           <button 
             className={`btn-toggle-advanced ${mostrarFiltrosAvancados ? 'active' : ''}`}
             onClick={() => setMostrarFiltrosAvancados(!mostrarFiltrosAvancados)}
+            aria-expanded={mostrarFiltrosAvancados}
           >
-            ⚙️ Filtros Avançados {filtrosAcessibilidade.length > 0 && `(${filtrosAcessibilidade.length})`}
+            <span aria-hidden="true">⚙️</span> Filtros Avançados {filtrosAcessibilidade.length > 0 && `(${filtrosAcessibilidade.length})`}
           </button>
 
           {mostrarFiltrosAvancados && (
-            <div className="advanced-filters-panel">
+            <div className="advanced-filters-panel" role="region" aria-label="Painel de filtros de acessibilidade">
               <p className="advanced-filters-title">Mostrar apenas locais que possuam:</p>
               <div className="advanced-filters-grid">
                 {itensAcessibilidade.map(item => (
@@ -189,6 +204,7 @@ function Home() {
                     key={item.id}
                     className={`adv-filter-item ${filtrosAcessibilidade.includes(item.id) ? 'selected' : ''}`}
                     onClick={() => toggleFiltroAcessibilidade(item.id)}
+                    aria-pressed={filtrosAcessibilidade.includes(item.id)}
                   >
                     <span aria-hidden="true">{item.icone}</span> {item.nome}
                   </button>
@@ -203,7 +219,7 @@ function Home() {
           )}
         </div>
 
-        <div className="cards-section" aria-label="Lista de estabelecimentos">
+        <div className="cards-section">
           
           <div className="cards-header">
             <h2 className="cards-title">Locais em Destaque</h2>
@@ -216,9 +232,9 @@ function Home() {
                 value={ordenacao} 
                 onChange={(e) => setOrdenacao(e.target.value)}
               >
-                <option value="relevantes">⭐ Mais Relevantes</option>
-                <option value="alfabetica_asc">🔤 A - Z</option>
-                <option value="alfabetica_desc">🔤 Z - A</option>
+                <option value="relevantes">Mais Relevantes</option>
+                <option value="alfabetica_asc">Ordem Alfabética A - Z</option>
+                <option value="alfabetica_desc">Ordem Alfabética Z - A</option>
               </select>
             </div>
           </div>
@@ -226,10 +242,10 @@ function Home() {
           {carregando && <p className="status-msg" aria-live="polite">Buscando locais...</p>}
           {erro && <p className="status-msg erro" role="alert">{erro}</p>}
           {!carregando && !erro && locaisProcessados.length === 0 && (
-            <p className="status-msg">Nenhum estabelecimento encontrado com esses filtros. 🔍</p>
+            <p className="status-msg" aria-live="polite">Nenhum estabelecimento encontrado com esses filtros. 🔍</p>
           )}
 
-          <div className="cards-grid">
+          <div className="cards-grid" aria-label="Lista de estabelecimentos encontrados">
             {locaisProcessados.map((local) => (
               <CardLocal 
                 key={local.id}
@@ -262,9 +278,10 @@ function Home() {
         />
       )}
 
+      {/* BOTÃO FLUTUANTE DE CADASTRO ACCESSIBLE */}
       {usuarioLogado && (
-        <Link to="/cadastrar" className="floating-action-button" title="Cadastrar Novo Local">
-          <span className="fab-icon">+</span>
+        <Link to="/cadastrar" className="floating-action-button" aria-label="Cadastrar Novo Local">
+          <span className="fab-icon" aria-hidden="true">+</span>
           <span className="fab-text">Cadastrar Local</span>
         </Link>
       )}
