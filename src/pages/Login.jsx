@@ -210,7 +210,7 @@ function Login() {
                 <>
                   <div className="form-group-row">
                     <div className="form-group" style={{ flex: 1 }}>
-                      <label htmlFor="pergunta_secreta">Pergunta Secreta (Para recuperar senha)</label>
+                      <label htmlFor="pergunta_secreta">Pergunta Secreta</label>
                       <select id="pergunta_secreta" name="pergunta_secreta" value={formData.pergunta_secreta} onChange={handleChange} required>
                         <option value="">Selecione uma pergunta...</option>
                         <option value="Qual o nome do seu primeiro animal de estimação?">Qual o nome do seu primeiro animal de estimação?</option>
