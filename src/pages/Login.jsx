@@ -92,6 +92,7 @@ function Login() {
         setMensagem({ tipo: 'erro', texto: textoErro });
       }
     } catch (error) {
+      console.error('Detalhes do erro:', error);
       setMensagem({ tipo: 'erro', texto: 'Erro de conexão.' });
     } finally {
       setCarregando(false);
@@ -125,6 +126,7 @@ function Login() {
         setMensagem({ tipo: 'erro', texto: textoErro });
       }
     } catch (error) {
+      console.error('Detalhes do erro:', error);
       setMensagem({ tipo: 'erro', texto: 'Erro de conexão.' });
     } finally {
       setCarregando(false);
