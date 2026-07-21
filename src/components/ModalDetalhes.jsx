@@ -36,14 +36,14 @@ function ModalDetalhes({ local, fecharModal }) {
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     
-    // Chamamos a função memorizada
+    // Chama a função memorizada
     // eslint-disable-next-line react-hooks/set-state-in-effect
     carregarAvaliacoes();
 
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [carregarAvaliacoes]); // Agora carregarAvaliacoes é uma dependência segura e o ESLint não reclama!
+  }, [carregarAvaliacoes]); 
 
   const handleCompartilhar = () => {
     const link = window.location.href;

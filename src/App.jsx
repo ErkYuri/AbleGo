@@ -12,7 +12,7 @@ function App() {
       <main style={{ paddingTop: '4rem' }}>
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* Adicionamos o 'r' no final para combinar com o botão flutuante */}
+          {/* Adicionado o 'r' no final para combinar com o botão flutuante */}
           <Route path="/cadastrar" element={<CadastroLocal />} />
           <Route path="/login" element={<Login />} />
           <Route path="/perfil" element={<Perfil />} />
