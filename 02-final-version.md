@@ -45,9 +45,3 @@ Para rodar o projeto localmente, é necessário ter o Node.js e o PostgreSQL ins
 *   OPENJS FOUNDATION. Node.js Documentation. Disponível em: https://nodejs.org/en/docs/. Acesso em: 2026.
 *   POSTGRESQL GLOBAL DEVELOPMENT GROUP. PostgreSQL Documentation. Disponível em: https://www.postgresql.org/docs/. Acesso em: 2026.
 *   W3C. Web Content Accessibility Guidelines (WCAG) 2.1. Disponível em: https://www.w3.org/TR/WCAG21/. Acesso em: 2026.
-
----
-
-## 🔗 Link da Apresentação
-
-[link do video youtube]
